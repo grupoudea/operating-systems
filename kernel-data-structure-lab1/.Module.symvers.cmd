@@ -1,1 +1,0 @@
-cmd_/home/berracode/Documentos/bridge_module_kernel_data_structures-main-copia-copia2/Module.symvers := sed 's/\.ko$$/\.o/' /home/berracode/Documentos/bridge_module_kernel_data_structures-main-copia-copia2/modules.order | scripts/mod/modpost -m -a  -o /home/berracode/Documentos/bridge_module_kernel_data_structures-main-copia-copia2/Module.symvers -e -i Module.symvers   -T -

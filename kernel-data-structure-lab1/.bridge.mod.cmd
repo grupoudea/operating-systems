@@ -1,1 +1,0 @@
-cmd_/home/berracode/Documentos/bridge_module_kernel_data_structures-main-copia-copia2/bridge.mod := { echo  /home/berracode/Documentos/bridge_module_kernel_data_structures-main-copia-copia2/bridge.o;  echo; } > /home/berracode/Documentos/bridge_module_kernel_data_structures-main-copia-copia2/bridge.mod
