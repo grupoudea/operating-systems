@@ -1,0 +1,1 @@
+cmd_/home/jlopez/OS/scull2/scull.ko := ld -r -m elf_x86_64 -z max-page-size=0x200000 -T ./scripts/module-common.lds --build-id  -o /home/jlopez/OS/scull2/scull.ko /home/jlopez/OS/scull2/scull.o /home/jlopez/OS/scull2/scull.mod.o ;  true
