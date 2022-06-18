@@ -74,16 +74,16 @@ int validateString(char* string){
 void usageMenu(){
     printf("uso: clientBridge [--help] \n");
     printf("\n");
-    printf("  %s <path-file> \t\t\t\t Lee las líneas de un archivo y las muestra en orden inverso. \n",ORDEN_INVERSO);
-    printf("  --random <path-file> \t\t\t\t\t Baraja aleatoriamente las líneas de un archivo. \n");
-    printf("  --validar-simetria <path-file> \t\t\t Lee un archivo .c y valida la simetría de los paréntesis y llaves. \n");
-    printf("  --cola-prioridad <path-file> <ALTA|MEDIA|BAJA> \t Crea una cola con prioridad \n");
-    printf("  --destruir-lista <path-file> \t\t\t\t Destruye una lista totalmente \n");
-    printf("  --invertir <path-file> \t\t\t\t Invierte los nodos de una lista \n");
-    printf("  --concatenar <path-file-1> <path-file-2> \t\t Concatena dos listas \n");
-    printf("  --rotacion <n> <path-file> \t\t\t\t Rota la lista N veces a la derecha \n");
-    printf("  --limpiar-lista <path-file> \t\t\t\t Limpia los valores idénticos de una lista. \n");
-    printf("  --mayor <path-file> \t\t\t\t\t Busca el mayor en una lista. \n");
+    printf("  %s <path-file> \t\t\t\t Lee las líneas de un archivo y las muestra en orden inverso. \n", ORDEN_INVERSO);
+    printf("  %s <path-file> \t\t\t\t\t Baraja aleatoriamente las líneas de un archivo. \n", RANDOM);
+    printf("  %s <path-file> \t\t\t Lee un archivo .c y valida la simetría de los paréntesis y llaves. \n", VALIDAR_SIMETRIA);
+    printf("  %s <path-file> <ALTA|MEDIA|BAJA> \t Crea una cola con prioridad \n", COLA_PRIORIDAD);
+    printf("  %s <path-file> \t\t\t\t Destruye una lista totalmente \n", DESTRUIR_LISTA);
+    printf("  %s <path-file> \t\t\t\t Invierte los nodos de una lista \n", INVERTIR);
+    printf("  %s <path-file-1> <path-file-2> \t\t Concatena dos listas \n", CONCATENAR);
+    printf("  %s <n> <path-file> \t\t\t\t Rota la lista N veces a la derecha \n", ROTACION);
+    printf("  %s <path-file> \t\t\t\t Limpia los valores idénticos de una lista. \n", LIMPIAR_LISTA);
+    printf("  %s <path-file> \t\t\t\t\t Busca el mayor en una lista. \n", MAYOR);
 }
 
 void chooseOption(char* option){
