@@ -122,3 +122,5 @@ dkms.conf
 
 lab-class-programs/helloWorld
 /.project
+
+.*
