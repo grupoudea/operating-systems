@@ -8,6 +8,9 @@
 #include "clientBridge.h"
 #include "constants.h"
 
+char** argsv;
+int argsc;
+
 void write_message(int fd, unsigned long command, char * message){
     if (ioctl(fd, command, message) == -1){
         perror("Write message error at ioctl");
@@ -54,7 +57,7 @@ void send_empty_command(int fd, unsigned long command){
 
 int callModule(){
     const char *file_name = "/dev/bridgeOwn"; //used by ioctl
-     int fd;
+    int fd;
 
     fd = open(file_name, O_RDWR);
     if (fd == -1){
@@ -81,12 +84,26 @@ void usageMenu(){
     printf("  %s <path-file> \t\t\t\t Destruye una lista totalmente \n", DESTRUIR_LISTA);
     printf("  %s <path-file> \t\t\t\t Invierte los nodos de una lista \n", INVERTIR);
     printf("  %s <path-file-1> <path-file-2> \t\t Concatena dos listas \n", CONCATENAR);
-    printf("  %s <n> <path-file> \t\t\t\t Rota la lista N veces a la derecha \n", ROTACION);
+    printf("  %s <path-file> <n> \t\t\t\t Rota la lista N veces a la derecha \n", ROTACION);
     printf("  %s <path-file> \t\t\t\t Limpia los valores idénticos de una lista. \n", LIMPIAR_LISTA);
     printf("  %s <path-file> \t\t\t\t\t Busca el mayor en una lista. \n", MAYOR);
 }
 
+char* getPathFile(){
+    char* pathfile = "/uk";
+    if(argsc>2){
+      pathfile = argsv[2];
+    }else{
+        perror("ERROR: no se ha encontrado un pathfile\n\n");
+        usageMenu();
+        exit(-1);
+    }
+    return pathfile;
+}
+
 void chooseOption(char* option){
+    char* pathfile = getPathFile();
+
     if(strcmp(ORDEN_INVERSO, option) == 0){
 
     }else if(strcmp(RANDOM, option) == 0){
@@ -112,11 +129,18 @@ void chooseOption(char* option){
     }
 }
 
-int main(int argc, char *argv[]){
+char* getOption(){
     char *option = "--help";
-    if(validateString(argv[1]) == 0){
-        option = argv[1];
+    if(argsc>1){
+      option = argsv[1];
     }
-    chooseOption(option);
+    return option;
+}
+
+int main(int argc, char *argv[]){
+    argsc = argc;
+    argsv = argv;
+
+    chooseOption(getOption());
     return 0;
 }
