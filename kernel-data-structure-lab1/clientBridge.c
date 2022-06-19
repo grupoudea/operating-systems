@@ -85,7 +85,7 @@ void usageMenu(){
 char* getPathFile(){
     char* pathfile = "/uk";
     if(argsc>2){
-      pathfile = argsv[2];
+        pathfile = argsv[2];
     }else{
         usageMenu();
         killClientBridge("no se ha encontrado un pathfile");
@@ -95,6 +95,13 @@ char* getPathFile(){
 
 void chooseOption(char* option){
     char* pathfile = getPathFile();
+    char** linesArray;
+    readFile(pathfile, linesArray);
+
+    for ( int i = 0; i < 7; i++)
+    {
+        printf("valor regreso= %s",linesArray[i]);
+    }
 
     if(strcmp(ORDEN_INVERSO, option) == 0){
 
