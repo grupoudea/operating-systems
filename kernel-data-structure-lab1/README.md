@@ -35,6 +35,8 @@ make
 ```sh
 gcc -o clientBridge clientBridge.c
 
+gcc -o clientBridge clientBridge.c utilsClientBridge.c
+
 ```
 
 ### Up module

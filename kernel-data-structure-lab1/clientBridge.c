@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "clientBridge.h"
 #include "constants.h"
+#include "utilsClientBridge.h"
 
 char** argsv;
 int argsc;
@@ -66,14 +67,6 @@ int callModule(){
     }
 }
 
-int validateString(char* string){
-    if(string == NULL){
-        return 1;
-    }else{
-        return 0;
-    }
-}
-
 void usageMenu(){
     printf("uso: clientBridge [--help] \n");
     printf("\n");
@@ -94,9 +87,8 @@ char* getPathFile(){
     if(argsc>2){
       pathfile = argsv[2];
     }else{
-        perror("ERROR: no se ha encontrado un pathfile\n\n");
         usageMenu();
-        exit(-1);
+        killClientBridge("no se ha encontrado un pathfile");
     }
     return pathfile;
 }
