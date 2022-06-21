@@ -56,6 +56,20 @@ void send_empty_command(int fd, unsigned long command){
     }
 }
 
+void write_several_messages(int fd){
+    write_message(fd, BRIDGE_W_S, "Message 1");
+    write_message(fd, BRIDGE_W_S, "Message 2");
+    write_message(fd, BRIDGE_W_S, "Message 3");
+}
+
+void read_all_messages(int fd){
+	char message[100];
+	while( send_empty_command(fd, BRIDGE_STATE_S) > 0){
+	    read_message(fd, BRIDGE_R_S, message);
+	    printf("Message: %s\n", message);
+	}
+}
+
 int callModule(){
     const char *file_name = "/dev/bridgeOwn"; //used by ioctl
     int fd;
