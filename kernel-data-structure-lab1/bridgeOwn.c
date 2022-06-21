@@ -208,9 +208,9 @@ int bridge_init_module(void)
  */
 	if (bridge_major) {
 		dev = MKDEV(bridge_major, bridge_minor);
-		result = register_chrdev_region(dev, bridge_nr_devs, "bridge");
+		result = register_chrdev_region(dev, bridge_nr_devs, "bridgeOwn");
 	} else {
-		result = alloc_chrdev_region(&dev, bridge_minor, bridge_nr_devs, "bridge");
+		result = alloc_chrdev_region(&dev, bridge_minor, bridge_nr_devs, "bridgeOwn");
 		bridge_major = MAJOR(dev);
         	bridge_devices = kmalloc(bridge_nr_devs * sizeof(struct bridge_dev), GFP_KERNEL);
 	}
