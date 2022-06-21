@@ -13,38 +13,6 @@
 #include <asm/uaccess.h>
 #include "bridgeOwn.h"
 
-/*
- * Our parameters which can be set at load time.
- */
-
-#define BRIDGE_CREATE_Q _IO('p', 1)                     //Create a queue
-#define BRIDGE_W_HIGH_PRIOR_Q _IOW('p', 2, char *)
-#define BRIDGE_W_MIDDLE_PRIOR_Q _IOW('p', 3, char *)
-#define BRIDGE_W_LOW_PRIOR_Q _IOW('p', 4, char *)
-#define BRIDGE_R_HIGH_PRIOR_Q _IOR('p', 5, char *)
-#define BRIDGE_R_MIDDLE_PRIOR_Q _IOR('p', 6, char *)
-#define BRIDGE_R_LOW_PRIOR_Q _IOR('p', 7, char *)
-#define BRIDGE_STATE_Q _IO('p', 8)
-#define BRIDGE_DESTROY_Q _IO('p', 9)
-
-#define BRIDGE_CREATE_S _IO('p', 10)                    //Create a stack
-#define BRIDGE_W_S _IOW('p', 11, char *)
-#define BRIDGE_R_S _IOR('p', 12, char *)
-#define BRIDGE_STATE_S _IO('p', 13)
-#define BRIDGE_DESTROY_S _IO('p', 14)
-
-#define BRIDGE_CREATE_L _IO('p', 15)                    //Create a list
-#define BRIDGE_W_L _IOW('p', 16, char *)
-#define BRIDGE_R_L _IOR('p', 17, char *)
-#define BRIDGE_INVERT_L _IO('p', 18)
-#define BRIDGE_ROTATE_L _IOW('p', 19, int *)
-#define BRIDGE_CLEAN_L _IO('p', 20)
-#define BRIDGE_GREATER_VAL_L _IOR('p', 21, char *)
-#define BRIDGE_END_L _IO('p', 22)
-#define BRIDGE_CONCAT_L _IO('p', 23)
-#define BRIDGE_STATE_L _IO('p', 24)
-#define BRIDGE_DESTROY_L _IO('p', 25)
-
 int bridge_major =   BRIDGE_MAJOR;
 int bridge_minor =   0;
 int bridge_nr_devs = BRIDGE_NR_DEVS;	/* number of bare bridge devices */
@@ -56,16 +24,39 @@ module_param(bridge_nr_devs, int, S_IRUGO);
 MODULE_AUTHOR("Jheisson Argiro Lopez Restrepo");
 MODULE_LICENSE("Dual BSD/GPL");
 
+LIST_HEAD(stack);
+
+static void add_element_to_stack(char *node_element_msg){
+	struct string_node *tmp_element;
+	tmp_element = kmalloc(sizeof(struct string_node), GFP_KERNEL);
+	strcpy(tmp_element->message, node_element_msg);
+	INIT_LIST_HEAD(&tmp_element->list);
+	list_add(&(tmp_element->list), &stack);
+}
+
+void mylist_exit(void){
+        struct string_node *tmp_element;
+	struct list_head *watch, *next;
+	list_for_each_safe(watch, next, &stack){
+        	tmp_element = list_entry(watch, struct string_node, list);
+        	list_del(&(tmp_element->list));
+		kfree(tmp_element);
+     	}
+     	//kfree(&stack);
+}
+
 struct bridge_dev *bridge_devices;	/* allocated in bridge_init_module */
 
 static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
+    int return_value = 0;
     int data;
     char message[100];
+    struct string_node *tmp_element;
     switch(cmd){
 	case BRIDGE_CREATE_Q:
             printk(KERN_INFO "message %s\n", "bla");
 	    //Return a posituve value indicating the state of the queue
-	    return 1;
+	    return_value = 1;
 	    break;
 	case BRIDGE_W_HIGH_PRIOR_Q:
     	    raw_copy_from_user(message, (char *)arg, 100);
@@ -94,16 +85,26 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    break;
 
 	case BRIDGE_CREATE_S:
-	    printk(KERN_INFO "message %s\n", "bla8");
+	    printk(KERN_INFO "Stack succesfully created\n");
 	    break;
 	case BRIDGE_W_S:
-            printk(KERN_INFO "message %s\n", "bla9");
+            raw_copy_from_user(message, (char *)arg, 100);
+	    add_element_to_stack(message);
+            printk(KERN_INFO "Element succesfully added to the stack\n");
 	    break;
 	case BRIDGE_R_S:
-            printk(KERN_INFO "message %s\n", "bla10");
+	    tmp_element = list_last_entry(&stack, struct string_node, list);
+            list_del(&(tmp_element->list));
+	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
+	    kfree(tmp_element);
 	    break;
 	case BRIDGE_STATE_S:
-            printk(KERN_INFO "message %s\n", "bla11");
+            if(list_empty(&stack) != 0){
+		return_value = 0;
+	    }else{
+		return_value = 1;
+	    }
+	    printk(KERN_INFO "Stack state succesfully sended!!!\n");
 	    break;
 	case BRIDGE_DESTROY_S:
             printk(KERN_INFO "message %s\n", "bla12");
@@ -129,7 +130,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
              printk(KERN_INFO "message %s\n", "bla18");
 	     break;
 	case BRIDGE_GREATER_VAL_L:
-	     strcpy((char *)arg, "MensajePrueba");
+	     //strcpy((char *)arg, "MensajePrueba");
              printk(KERN_INFO "message %s\n", "bla19");
 	     break;
 	case BRIDGE_END_L:
@@ -144,7 +145,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	case BRIDGE_DESTROY_L:
              printk(KERN_INFO "message %s\n", "bla24");
     }
-    return 0;
+    return return_value;
 }
 
 struct file_operations bridge_fops = {
@@ -165,7 +166,7 @@ void bridge_cleanup_module(void)
 {
 	int i;
 	dev_t devno = MKDEV(bridge_major, bridge_minor);
-
+	mylist_exit();
 	/* Get rid of our char dev entries */
 	if (bridge_devices) {
 		for (i = 0; i < bridge_nr_devs; i++) {
@@ -246,3 +247,4 @@ int bridge_init_module(void)
 
 module_init(bridge_init_module);
 module_exit(bridge_cleanup_module);
+
