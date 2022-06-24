@@ -109,20 +109,31 @@ char* getPathFile(){
     return pathfile;
 }
 
+void validarSimetria(int fd,char *file,int numOfLines){
+    char test[100];
+    ioctl(fd, BRIDGE_W_S, "Hola este es un mensaje a la pila \n");
+    ioctl(fd, BRIDGE_R_S, test);
+    printf("%s\n",test);
+}
 void chooseOption(char* option){
+ 
+    int fd = callModule();
     char* pathfile = getPathFile();
     int numOfLines = 0;
     char **linesArray=readFile(pathfile,&numOfLines);
+    printf("informacion del archivo : \n");
     for ( int i = 0; i < numOfLines; i++)
     {
-        printf("valor regreso= %s",linesArray[i]);
+        printf("%s",linesArray[i]);
     }
     printf("\n");
+
     if(strcmp(ORDEN_INVERSO, option) == 0){
 
     }else if(strcmp(RANDOM, option) == 0){
 
     }else if(strcmp(VALIDAR_SIMETRIA, option) == 0){
+      validarSimetria(fd,linesArray,numOfLines);
 
     }else if(strcmp(COLA_PRIORIDAD, option) == 0){
 

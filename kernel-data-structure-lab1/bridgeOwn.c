@@ -52,6 +52,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
     int data;
     char message[100];
     struct string_node *tmp_element;
+	printk("llego al kernel");
     switch(cmd){
 	case BRIDGE_CREATE_Q:
             printk(KERN_INFO "message %s\n", "bla");
@@ -88,11 +89,13 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    printk(KERN_INFO "Stack succesfully created\n");
 	    break;
 	case BRIDGE_W_S:
+			printk(KERN_INFO "Creando");
             raw_copy_from_user(message, (char *)arg, 100);
-	    add_element_to_stack(message);
+	    	add_element_to_stack(message);
             printk(KERN_INFO "Element succesfully added to the stack\n");
 	    break;
 	case BRIDGE_R_S:
+		printk(KERN_INFO "Leyendo");
 	    tmp_element = list_last_entry(&stack, struct string_node, list);
             list_del(&(tmp_element->list));
 	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
