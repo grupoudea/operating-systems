@@ -48,12 +48,14 @@ void read_int(int fd, unsigned long command, int * value){
     }
 }
 
-void send_empty_command(int fd, unsigned long command){
-    if(ioctl(fd, command) == -1){
+int send_empty_command(int fd, unsigned long command){
+    int result = ioctl(fd, command);
+    if( result == -1){
        perror("Send command error at ioctl");
     }else{
         printf("Command OK to the kernel\n");
     }
+    return result;
 }
 
 void write_several_messages(int fd){
@@ -109,14 +111,13 @@ char* getPathFile(){
 
 void chooseOption(char* option){
     char* pathfile = getPathFile();
-    char** linesArray;
-    readFile(pathfile, linesArray);
-
-    for ( int i = 0; i < 7; i++)
+    int numOfLines = 0;
+    char **linesArray=readFile(pathfile,&numOfLines);
+    for ( int i = 0; i < numOfLines; i++)
     {
         printf("valor regreso= %s",linesArray[i]);
     }
-
+    printf("\n");
     if(strcmp(ORDEN_INVERSO, option) == 0){
 
     }else if(strcmp(RANDOM, option) == 0){

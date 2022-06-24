@@ -1,5 +1,5 @@
 int validateString(char*);
 void killClientBridge(char*);
-void readFile(char* filename,  char** array);
+char **readFile(char* filename, int *numOfLines);
 int numberOfLines(FILE* file, int* size);
 int stringLength(char * arrayChar);
