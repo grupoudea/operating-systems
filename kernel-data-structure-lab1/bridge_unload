@@ -4,6 +4,8 @@ device="bridgeOwn"
 
 # invoke rmmod with all arguments we got
 /sbin/rmmod $module $* || exit 1
+echo "      Removing from unload script"
 
 # Remove stale nodes
 rm -f /dev/${device} /dev/${device}0
+echo "      The Module has been unloaded"

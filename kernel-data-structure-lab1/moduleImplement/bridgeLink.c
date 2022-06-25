@@ -30,11 +30,11 @@ void ordenInverso(char** arrayLines, int numOfLines){
         printf("%s",arrayLines[i]);
         write_message(fd, BRIDGE_W_S, arrayLines[i]);
     }
-    char test[100];
+    char fileLine[100];
     printf("\n######  Lineas del archivo orden inverso   ######\n");
     for (int i = 0; i < numOfLines; i++){
-        write_message(fd, BRIDGE_R_S, test);
-        printf("%s",test);
+        write_message(fd, BRIDGE_R_S, fileLine);
+        printf("%s",fileLine);
     }
 }
 
