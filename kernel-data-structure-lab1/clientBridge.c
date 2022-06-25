@@ -11,17 +11,6 @@
 char** argsv;
 int argsc;
 
-int callModule(){
-    const char *file_name = "/dev/bridgeOwn"; //used by ioctl
-    int fd;
-
-    fd = open(file_name, O_RDWR);
-    if (fd == -1){
-        perror("Bridge ioctl file open");
-        return 2;
-    }
-}
-
 void usageMenu(){
     printf("uso: clientBridge [--help] \n");
     printf("\n");
@@ -50,18 +39,17 @@ char* getPathFile(){
 
 void chooseOption(char* option){
 
-    int fd = callModule();
     char* pathfile = getPathFile();
     int numOfLines = 0;
     char** linesArray = readFile(pathfile, &numOfLines);
 
     if(strcmp(ORDEN_INVERSO, option) == 0){
-        ordenInverso(fd, linesArray, numOfLines);
+        ordenInverso(linesArray, numOfLines);
 
     }else if(strcmp(RANDOM, option) == 0){
 
     }else if(strcmp(VALIDAR_SIMETRIA, option) == 0){
-      validarSimetria(fd,linesArray,numOfLines);
+      validarSimetria(linesArray, numOfLines);
 
     }else if(strcmp(COLA_PRIORIDAD, option) == 0){
 
@@ -72,7 +60,7 @@ void chooseOption(char* option){
     }else if(strcmp(CONCATENAR, option) == 0){
 
     }else if(strcmp(ROTACION, option) == 0){
-
+        rotateToRight(5);
     }else if(strcmp(LIMPIAR_LISTA, option) == 0){
 
     }else if(strcmp(MAYOR, option) == 0){
