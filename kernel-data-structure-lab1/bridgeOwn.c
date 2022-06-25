@@ -96,8 +96,8 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    break;
 	case BRIDGE_R_S:
 		printk(KERN_INFO "Reading\n");
-	    tmp_element = list_last_entry(&stack, struct string_node, list);
-            list_del(&(tmp_element->list));
+	    tmp_element = list_first_entry(&stack, struct string_node, list);
+        list_del(&(tmp_element->list));
 	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
 	    kfree(tmp_element);
 	    break;
