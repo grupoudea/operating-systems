@@ -89,13 +89,13 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    printk(KERN_INFO "Stack succesfully created\n");
 	    break;
 	case BRIDGE_W_S:
-			printk(KERN_INFO "Creando");
+			printk(KERN_INFO "Creating\n");
             raw_copy_from_user(message, (char *)arg, 100);
 	    	add_element_to_stack(message);
             printk(KERN_INFO "Element succesfully added to the stack\n");
 	    break;
 	case BRIDGE_R_S:
-		printk(KERN_INFO "Leyendo");
+		printk(KERN_INFO "Reading\n");
 	    tmp_element = list_last_entry(&stack, struct string_node, list);
             list_del(&(tmp_element->list));
 	    raw_copy_to_user((char *)arg, tmp_element->message, 100);

@@ -37,6 +37,8 @@ gcc -o clientBridge clientBridge.c
 
 gcc -o clientBridge clientBridge.c utilsClientBridge.c
 
+gcc -o clientBridge clientBridge.c utilsClientBridge.c moduleImplement/bridgeLink.c moduleImplement/bridgeIO.c
+
 ```
 
 ### Up module

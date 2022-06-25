@@ -3,74 +3,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <stdlib.h>
-#include "clientBridge.h"
+#include "moduleImplement/bridgeLink.h"
 #include "constants.h"
 #include "utilsClientBridge.h"
 
 char** argsv;
 int argsc;
-
-void write_message(int fd, unsigned long command, char * message){
-    if (ioctl(fd, command, message) == -1){
-        perror("Write message error at ioctl");
-    }
-}
-
-void read_message(int fd, unsigned long command, char * message){
-    if(ioctl(fd, command, message) == -1){
-	perror("Read message error at ioctl");
-    }else{
-	printf("Copy the messsage from the kernel\n");
-    }
-}
-
-void read_message_param(int fd, unsigned long command, int * value){
-    if(ioctl(fd, command, value) == -1){
-        perror("Read message param error at ioctl");
-    }else{
-        printf("Copy the messsage from the kernel\n");
-    }
-}
-
-void write_int(int fd, unsigned long command, int * value){
-    if (ioctl(fd, command, value) == -1){
-        perror("Write int error at ioctl");
-    }
-}
-
-void read_int(int fd, unsigned long command, int * value){
-    if(ioctl(fd, command, value) == -1){
-        perror("Read int error at ioctl");
-    }else{
-        printf("Copy the int from the kernel\n");
-    }
-}
-
-int send_empty_command(int fd, unsigned long command){
-    int result = ioctl(fd, command);
-    if( result == -1){
-       perror("Send command error at ioctl");
-    }else{
-        printf("Command OK to the kernel\n");
-    }
-    return result;
-}
-
-void write_several_messages(int fd){
-    write_message(fd, BRIDGE_W_S, "Message 1");
-    write_message(fd, BRIDGE_W_S, "Message 2");
-    write_message(fd, BRIDGE_W_S, "Message 3");
-}
-
-void read_all_messages(int fd){
-	char message[100];
-	while( send_empty_command(fd, BRIDGE_STATE_S) > 0){
-	    read_message(fd, BRIDGE_R_S, message);
-	    printf("Message: %s\n", message);
-	}
-}
 
 int callModule(){
     const char *file_name = "/dev/bridgeOwn"; //used by ioctl
@@ -107,13 +46,6 @@ char* getPathFile(){
         killClientBridge("no se ha encontrado un pathfile");
     }
     return pathfile;
-}
-
-void validarSimetria(int fd,char **file,int numOfLines){
-    char test[100];
-    ioctl(fd, BRIDGE_W_S, "Hola este es un mensaje a la pila \n");
-    ioctl(fd, BRIDGE_R_S, test);
-    printf("%s\n",test);
 }
 
 void chooseOption(char* option){

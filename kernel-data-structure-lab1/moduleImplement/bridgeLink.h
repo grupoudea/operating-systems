@@ -1,0 +1,1 @@
+void validarSimetria(int fd,char **file,int numOfLines);
