@@ -40,6 +40,17 @@ void ordenInverso(char** arrayLines, int numOfLines){
 
 void rotateToRight(char* numberRotations){
     int fd = callModule();
-    printf("%s \n\n", numberRotations);
+    printf("Number of rotations = %s \n\n", numberRotations);
     write_message(fd, BRIDGE_ROTATE_L, numberRotations);
+}
+
+void concatTwoLists(char** firstList, int numFirstList, char** secondList, int numSecondList){
+    int fd = callModule();
+    char** lists[2] = {firstList, secondList};
+    write_message(fd, BRIDGE_CONCAT_L, "");
+}
+
+void cleanList(char** arrayLines, int numOfLines){
+    int fd = callModule();
+    write_message(fd, BRIDGE_CLEAN_L, "");
 }
