@@ -37,6 +37,25 @@ char* getPathFile(){
     return pathfile;
 }
 
+char* getNumberRotations(){
+    if(argsc > 3){
+        return argsv[3];
+    }else{
+        killClientBridge("Debe digitar la cantidad de rotaciones");
+    }
+}
+
+char* getPathFileSecond(){
+    char* pathfile = "/uk";
+    if(argsc > 3){
+        pathfile = argsv[3];
+    }else{
+        usageMenu();
+        killClientBridge("no se ha encontrado el segundo pathfile");
+    }
+    return pathfile;
+}
+
 void chooseOption(char* option){
 
     char* pathfile = getPathFile();
@@ -59,11 +78,15 @@ void chooseOption(char* option){
     }else if(strcmp(INVERTIR, option) == 0){
 
     }else if(strcmp(CONCATENAR, option) == 0){
-
+        char* secondPathfile = getPathFileSecond();
+        int numOfLinesToConcat = 0;
+        char** linesArrayToConcat = readFile(secondPathfile, &numOfLinesToConcat);
+        concatTwoLists(linesArray, numOfLines, linesArrayToConcat, numOfLinesToConcat);
     }else if(strcmp(ROTACION, option) == 0){
-        rotateToRight(5);
+        char* numberRotations = getNumberRotations();
+        rotateToRight(numberRotations, linesArray, numOfLines);
     }else if(strcmp(LIMPIAR_LISTA, option) == 0){
-
+        cleanList(linesArray, numOfLines);
     }else if(strcmp(MAYOR, option) == 0){
 
     }else{

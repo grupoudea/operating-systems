@@ -35,14 +35,14 @@ static void add_element_to_stack(char *node_element_msg){
 }
 
 void mylist_exit(void){
-        struct string_node *tmp_element;
+    struct string_node *tmp_element;
 	struct list_head *watch, *next;
 	list_for_each_safe(watch, next, &stack){
-        	tmp_element = list_entry(watch, struct string_node, list);
-        	list_del(&(tmp_element->list));
+       	tmp_element = list_entry(watch, struct string_node, list);
+       	list_del(&(tmp_element->list));
 		kfree(tmp_element);
-     	}
-     	//kfree(&stack);
+   	}
+    //kfree(&stack);
 }
 
 struct bridge_dev *bridge_devices;	/* allocated in bridge_init_module */
@@ -55,12 +55,12 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	printk("llego al kernel");
     switch(cmd){
 	case BRIDGE_CREATE_Q:
-            printk(KERN_INFO "message %s\n", "bla");
+        printk(KERN_INFO "message %s\n", "bla");
 	    //Return a posituve value indicating the state of the queue
 	    return_value = 1;
 	    break;
 	case BRIDGE_W_HIGH_PRIOR_Q:
-    	    raw_copy_from_user(message, (char *)arg, 100);
+    	raw_copy_from_user(message, (char *)arg, 100);
 	    printk(KERN_INFO "message %s\n", message);
 	    break;
 	case BRIDGE_W_MIDDLE_PRIOR_Q:
@@ -70,29 +70,28 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    printk(KERN_INFO "message %s\n", "bla2");
 	    break;
 	case BRIDGE_R_HIGH_PRIOR_Q:
-            printk(KERN_INFO "message %s\n", "bla3");
+        printk(KERN_INFO "message %s\n", "bla3");
 	    break;
 	case BRIDGE_R_MIDDLE_PRIOR_Q:
-            printk(KERN_INFO "message %s\n", "bla4");
+        printk(KERN_INFO "message %s\n", "bla4");
 	    break;
 	case BRIDGE_R_LOW_PRIOR_Q:
-            printk(KERN_INFO "message %s\n", "bla5");
+        printk(KERN_INFO "message %s\n", "bla5");
 	    break;
 	case BRIDGE_STATE_Q:
-            printk(KERN_INFO "message %s\n", "bla6");
+        printk(KERN_INFO "message %s\n", "bla6");
 	    break;
 	case BRIDGE_DESTROY_Q:
-            printk(KERN_INFO "message %s\n", "bla7");
+        printk(KERN_INFO "message %s\n", "bla7");
 	    break;
-
 	case BRIDGE_CREATE_S:
 	    printk(KERN_INFO "Stack succesfully created\n");
 	    break;
 	case BRIDGE_W_S:
-			printk(KERN_INFO "Creating\n");
-            raw_copy_from_user(message, (char *)arg, 100);
-	    	add_element_to_stack(message);
-            printk(KERN_INFO "Element succesfully added to the stack\n");
+		printk(KERN_INFO "Creating\n");
+        raw_copy_from_user(message, (char *)arg, 100);
+	    add_element_to_stack(message);
+        printk(KERN_INFO "Element succesfully added to the stack\n");
 	    break;
 	case BRIDGE_R_S:
 		printk(KERN_INFO "Reading\n");
@@ -102,51 +101,77 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    kfree(tmp_element);
 	    break;
 	case BRIDGE_STATE_S:
-            if(list_empty(&stack) != 0){
-		return_value = 0;
+        if(list_empty(&stack) != 0){
+			return_value = 0;
 	    }else{
-		return_value = 1;
+			return_value = 1;
 	    }
 	    printk(KERN_INFO "Stack state succesfully sended!!!\n");
 	    break;
 	case BRIDGE_DESTROY_S:
-            printk(KERN_INFO "message %s\n", "bla12");
+        printk(KERN_INFO "message %s\n", "bla12");
 	    break;
-
 	case BRIDGE_CREATE_L:
-             printk(KERN_INFO "message %s\n", "bla13");
-	     break;
+        printk(KERN_INFO "message %s\n", "bla13");
+	    break;
 	case BRIDGE_W_L:
-             printk(KERN_INFO "message %s\n", "bla14");
-	     break;
+		raw_copy_from_user(message, (char *)arg, 100);
+		printk(KERN_INFO "AGREGANDO ELEMENTO A LA LISTA STACK: message = %s\n", message);
+	  	add_element_to_stack(message);
+	    break;
 	case BRIDGE_R_L:
-             printk(KERN_INFO "message %s\n", "bla15");
-	     break;
+		/*ESTO RECORRE TODOS LOS REGISTROS DE LA LISTA STACK
+		struct string_node *tmp_element;
+		struct list_head *watch, *next;
+		list_for_each_safe(watch, next, &stack){
+			tmp_element = list_entry(watch, struct string_node, list);
+			char* valor = tmp_element->message;
+			printk(KERN_INFO "VALOR = %s\n", valor);
+		}*/
+		tmp_element = list_last_entry(&stack, struct string_node, list);
+        list_del(&(tmp_element->list));
+	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
+	    kfree(tmp_element);
+	    break;
 	case BRIDGE_INVERT_L:
-             printk(KERN_INFO "message %s\n", "bla16");
-	     break;
+        printk(KERN_INFO "message %s\n", "bla16");
+	    break;
 	case BRIDGE_ROTATE_L:
-             get_user(data, (int *)arg);
-             printk(KERN_INFO "message %d\n", data);
-	     break;
+		printk(KERN_INFO "------------ BRIDGE_ROTATE_L ROTAR LA LISTA \n");
+		raw_copy_from_user(message, (char*)arg, 100);
+		long numberRotations;
+		kstrtol(message, 10, &numberRotations);
+        printk(KERN_INFO "message BRIDGE_ROTATE_L numberRotations = %d\n", numberRotations);
+		printk(KERN_INFO "------------------------------------------------------------------\n\n");
+		int i = 0;
+		while (i < numberRotations){
+			struct list_head *head = &stack;
+			struct list_head *first;
+			if (!list_empty(head)) {
+				first = head->next;
+				list_move_tail(first, head);
+			}
+			i++;
+		}
+	    break;
 	case BRIDGE_CLEAN_L:
-             printk(KERN_INFO "message %s\n", "bla18");
-	     break;
+        printk(KERN_INFO "message BRIDGE_CLEAN_L %s\n", "bla18");
+	    break;
 	case BRIDGE_GREATER_VAL_L:
-	     //strcpy((char *)arg, "MensajePrueba");
-             printk(KERN_INFO "message %s\n", "bla19");
-	     break;
+	    //strcpy((char *)arg, "MensajePrueba");
+        printk(KERN_INFO "message %s\n", "bla19");
+	    break;
 	case BRIDGE_END_L:
-             printk(KERN_INFO "message %s\n", "bla21");
-	     break;
+        printk(KERN_INFO "message %s\n", "bla21");
+	    break;
 	case BRIDGE_CONCAT_L:
-             printk(KERN_INFO "message %s\n", "bla22");
-	     break;
+        printk(KERN_INFO "message BRIDGE_CONCAT_L %s\n", "bla22");
+	    break;
 	case BRIDGE_STATE_L:
-             printk(KERN_INFO "message %s\n", "bla23");
-	     break;
+        printk(KERN_INFO "message %s\n", "bla23");
+	    break;
 	case BRIDGE_DESTROY_L:
-             printk(KERN_INFO "message %s\n", "bla24");
+        printk(KERN_INFO "message %s\n", "bla24");
     }
     return return_value;
 }

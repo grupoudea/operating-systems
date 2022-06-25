@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include "bridgeIO.h"
 #include "bridgeLink.h"
+#include "../constants.h"
 
 int callModule(){
     const char *file_name = "/dev/bridgeOwn"; //used by ioctl
@@ -16,7 +17,7 @@ int callModule(){
 }
 
 void validarSimetria(char **file,int numOfLines){
-    char test[100];
+    char test[MAX_LENGTH_CHAR_BRIDGE];
     int fd = callModule();
     ioctl(fd, BRIDGE_W_S, "Hola este es un mensaje a la pila \n");
     ioctl(fd, BRIDGE_R_S, test);
@@ -30,7 +31,7 @@ void ordenInverso(char** arrayLines, int numOfLines){
         printf("%s",arrayLines[i]);
         write_message(fd, BRIDGE_W_S, arrayLines[i]);
     }
-    char fileLine[100];
+    char fileLine[MAX_LENGTH_CHAR_BRIDGE];
     printf("\n######  Lineas del archivo orden inverso   ######\n");
     for (int i = 0; i < numOfLines; i++){
         write_message(fd, BRIDGE_R_S, fileLine);
@@ -42,8 +43,30 @@ void randomLine(char** file, int numOfLines, char* fileName){
     
 }
 
-void rotateToRight(int numberRotations){
+void rotateToRight(char* numberRotations, char** arrayLines, int numOfLines){
+    printf("ROTAR A LA DERECHA\n\n");
     int fd = callModule();
-    write_message(fd, BRIDGE_ROTATE_L, "a");
+    printf("Number of rotations = %s \n\n", numberRotations);
+    for (int i = 0; i < numOfLines; i++){
+        printf("%s", arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    printf("\n\n LISTA ROTADA A LA DERECHA \n\n");
+    char valor[MAX_LENGTH_CHAR_BRIDGE];
+    write_message(fd, BRIDGE_ROTATE_L, numberRotations);
+    for (int i = 0; i < numOfLines; i++){
+        write_message(fd, BRIDGE_R_L, valor);
+        printf("%s \n", valor);
+    }
 }
 
+void concatTwoLists(char** firstList, int numFirstList, char** secondList, int numSecondList){
+    int fd = callModule();
+    char** lists[2] = {firstList, secondList};
+    write_message(fd, BRIDGE_CONCAT_L, "");
+}
+
+void cleanList(char** arrayLines, int numOfLines){
+    int fd = callModule();
+    write_message(fd, BRIDGE_CLEAN_L, "");
+}
