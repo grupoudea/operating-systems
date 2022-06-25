@@ -4,4 +4,4 @@ void ordenInverso(char** file, int numOfLines);
 
 void rotateToRight(int numberRotations);
 
-void randomLines(char* pathFile);
+void randomLines(char** file, int numOfLines, char* fileName);

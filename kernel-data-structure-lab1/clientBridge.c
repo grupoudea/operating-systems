@@ -47,6 +47,7 @@ void chooseOption(char* option){
         ordenInverso(linesArray, numOfLines);
 
     }else if(strcmp(RANDOM, option) == 0){
+        randomLines(linesArray, numOfLines);
 
     }else if(strcmp(VALIDAR_SIMETRIA, option) == 0){
       validarSimetria(linesArray, numOfLines);

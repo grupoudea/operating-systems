@@ -38,6 +38,10 @@ void ordenInverso(char** arrayLines, int numOfLines){
     }
 }
 
+void randomLine(char** file, int numOfLines, char* fileName){
+    
+}
+
 void rotateToRight(int numberRotations){
     int fd = callModule();
     write_message(fd, BRIDGE_ROTATE_L, "a");
