@@ -83,8 +83,7 @@ void chooseOption(char* option){
         concatTwoLists(linesArray, numOfLines, linesArrayToConcat, numOfLinesToConcat);
     }else if(strcmp(ROTACION, option) == 0){
         char* numberRotations = getNumberRotations();
-        int n = atoi(numberRotations);
-        rotateToRight(numberRotations);
+        rotateToRight(numberRotations, linesArray, numOfLines);
     }else if(strcmp(LIMPIAR_LISTA, option) == 0){
         cleanList(linesArray, numOfLines);
     }else if(strcmp(MAYOR, option) == 0){
