@@ -8,3 +8,4 @@
 #define ROTACION "--rotacion"
 #define LIMPIAR_LISTA "--limpiar-lista"
 #define MAYOR "--mayor"
+#define MAX_LENGTH_CHAR_BRIDGE 100

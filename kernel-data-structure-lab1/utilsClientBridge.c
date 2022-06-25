@@ -12,7 +12,7 @@ int validateString(char* string){
 }
 
 void killClientBridge(char* message){
-    printf("ERROR: %s n\n", message);
+    printf("ERROR: %s \n\n", message);
     exit(-1);
 }
 
