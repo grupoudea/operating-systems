@@ -16,44 +16,36 @@ void killClientBridge(char* message){
     exit(-1);
 }
 
-
 char** readFile(char* fileName,int *numOfLines){
-    FILE* input_file = fopen(fileName, "r");
-    if (!input_file){
+    FILE* inputFile = fopen(fileName, "r");
+    if (!inputFile){
         exit(EXIT_FAILURE);
     }
     int lines = 0;
-    numberOfLines(input_file, &lines);
-    printf("cantidad lineas: %d\n",lines);
-    rewind(input_file);
+    numberOfLines(inputFile, &lines);
+    rewind(inputFile);
     char** arrayChars = malloc(sizeof(char*) * lines);
     char* contents = NULL;
     size_t len = 0;
     int i = 0;
-    while (getline(&contents, &len, input_file) != -1){
+    while (getline(&contents, &len, inputFile) != -1){
         int cm = stringLength(contents);
         char* newChars = (char*)malloc(cm);
         strcpy(newChars, contents);
         arrayChars[i] = (char*)malloc(cm);
         arrayChars[i] = newChars;
-        // printf("%s\n", newChars);
         i++;
-
     }
-    // for (int i = 0; i < lines; i++)
-    // {
-    //     printf("vector = %s\n",arrayChars[i]);
-    // }
-    fclose(input_file);
+
+    fclose(inputFile);
     free(contents);
     *numOfLines=lines;
-     return arrayChars;
+    return arrayChars;
 }
 
 int stringLength(char * arrayChar){
     int i = 0;
-    while (arrayChar[i]!='\0')
-    {
+    while (arrayChar[i]!='\0'){
         i++;
     }
     return i;
@@ -67,10 +59,9 @@ int numberOfLines(FILE* file, int* size){
         if(character == '\n'){
             i++;
         }
-        if(character == EOF){  //Si el caracter es end of file imprimimos el contador y salimos del while
+        if(character == EOF){
             i++;
             *size = i;
-            // printf("%d\n",i);  //El número de lineas
             break;
         }
     }
