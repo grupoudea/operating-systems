@@ -38,8 +38,8 @@ void ordenInverso(char** arrayLines, int numOfLines){
     }
 }
 
-void rotateToRight(int numberRotations){
+void rotateToRight(char* numberRotations){
     int fd = callModule();
-    write_message(fd, BRIDGE_ROTATE_L, "a");
+    printf("%s \n\n", numberRotations);
+    write_message(fd, BRIDGE_ROTATE_L, numberRotations);
 }
-

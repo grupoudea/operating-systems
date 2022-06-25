@@ -37,6 +37,14 @@ char* getPathFile(){
     return pathfile;
 }
 
+char* getNumberRotations(){
+    if(argsc > 3){
+        return argsv[3];
+    }else{
+        killClientBridge("Debe digitar la cantidad de rotaciones");
+    }
+}
+
 void chooseOption(char* option){
 
     char* pathfile = getPathFile();
@@ -60,7 +68,9 @@ void chooseOption(char* option){
     }else if(strcmp(CONCATENAR, option) == 0){
 
     }else if(strcmp(ROTACION, option) == 0){
-        rotateToRight(5);
+        char* numberRotations = getNumberRotations();
+        int n = atoi(numberRotations);
+        rotateToRight(numberRotations);
     }else if(strcmp(LIMPIAR_LISTA, option) == 0){
 
     }else if(strcmp(MAYOR, option) == 0){
