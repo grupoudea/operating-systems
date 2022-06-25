@@ -127,10 +127,10 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	     break;
 	case BRIDGE_ROTATE_L:
              get_user(data, (int *)arg);
-             printk(KERN_INFO "message %d\n", data);
+             printk(KERN_INFO "message BRIDGE_ROTATE_L %d\n", data);
 	     break;
 	case BRIDGE_CLEAN_L:
-             printk(KERN_INFO "message %s\n", "bla18");
+             printk(KERN_INFO "message BRIDGE_CLEAN_L %s\n", "bla18");
 	     break;
 	case BRIDGE_GREATER_VAL_L:
 	     //strcpy((char *)arg, "MensajePrueba");
@@ -140,7 +140,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
              printk(KERN_INFO "message %s\n", "bla21");
 	     break;
 	case BRIDGE_CONCAT_L:
-             printk(KERN_INFO "message %s\n", "bla22");
+             printk(KERN_INFO "message BRIDGE_CONCAT_L %s\n", "bla22");
 	     break;
 	case BRIDGE_STATE_L:
              printk(KERN_INFO "message %s\n", "bla23");
