@@ -16,7 +16,7 @@ void validarSimetria(int fd,char **file,int numOfLines){
     printf("%s\n",test);
 }
 
-void ordenInverso(int fd,char** arrayLines,int numOfLines){
+void ordenInverso(int fd, char** arrayLines, int numOfLines){
     printf("\n######  Lineas del archivo orden original   ######\n");
 
     for (int i = 0; i < numOfLines; i++){
@@ -24,11 +24,11 @@ void ordenInverso(int fd,char** arrayLines,int numOfLines){
         write_message(fd, BRIDGE_W_S, arrayLines[i]);
         sleep(2);
     }
-    char test[100];
+    char fileLine[100];
     printf("\n######  Lineas del archivo orden inverso   ######\n");
     for (int i = 0; i < numOfLines; i++){
-        write_message(fd, BRIDGE_R_S, test);
-        printf("%s",test);
+        write_message(fd, BRIDGE_R_S, fileLine);
+        printf("%s",fileLine);
     }
 
 }

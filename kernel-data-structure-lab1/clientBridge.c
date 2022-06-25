@@ -53,7 +53,7 @@ void chooseOption(char* option){
     int fd = callModule();
     char* pathfile = getPathFile();
     int numOfLines = 0;
-    char **linesArray = readFile(pathfile,&numOfLines);
+    char** linesArray = readFile(pathfile, &numOfLines);
 
     if(strcmp(ORDEN_INVERSO, option) == 0){
         ordenInverso(fd, linesArray, numOfLines);
