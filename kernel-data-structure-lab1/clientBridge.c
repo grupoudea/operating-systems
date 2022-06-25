@@ -56,6 +56,7 @@ void chooseOption(char* option){
     char **linesArray = readFile(pathfile,&numOfLines);
 
     if(strcmp(ORDEN_INVERSO, option) == 0){
+        ordenInverso(fd, linesArray, numOfLines);
 
     }else if(strcmp(RANDOM, option) == 0){
 
