@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include "bridgeIO.h"
@@ -44,14 +47,14 @@ void rotateToRight(char* numberRotations, char** arrayLines, int numOfLines){
     int fd = callModule();
     printf("Number of rotations = %s \n\n", numberRotations);
     for (int i = 0; i < numOfLines; i++){
-        printf("%s", arrayLines[i]);
+        printf("%s \n", arrayLines[i]);
         write_message(fd, BRIDGE_W_L, arrayLines[i]);
     }
     printf("\n\n LISTA ROTADA A LA DERECHA \n\n");
     char valor[MAX_LENGTH_CHAR_BRIDGE];
     write_message(fd, BRIDGE_ROTATE_L, numberRotations);
     for (int i = 0; i < numOfLines; i++){
-        write_message(fd, BRIDGE_R_L, valor);
+        read_message(fd, BRIDGE_R_L, valor);
         printf("%s \n", valor);
     }
 }
@@ -63,6 +66,21 @@ void concatTwoLists(char** firstList, int numFirstList, char** secondList, int n
 }
 
 void cleanList(char** arrayLines, int numOfLines){
+    printf("LIMPIAR VALORES IDENTICOS DE LA LISTA\n\n");
     int fd = callModule();
-    write_message(fd, BRIDGE_CLEAN_L, "");
+    for (int i = 0; i < numOfLines; i++){
+        printf("%s \n", arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    char* valorCantidadRegistros[MAX_LENGTH_CHAR_BRIDGE];
+    read_message(fd, BRIDGE_CLEAN_L, valorCantidadRegistros);
+    int cantidadRegistros = atoi(valorCantidadRegistros);
+    printf("\n\n");
+    printf("LISTA LIMPIA DE VALORES IDENTICOS\n\n");
+    char valor[MAX_LENGTH_CHAR_BRIDGE];
+    for (int i = 0; i < cantidadRegistros; i++){
+        read_message(fd, BRIDGE_R_L, valor);
+        printf("%s \n", valor);
+    }
+   
 }
