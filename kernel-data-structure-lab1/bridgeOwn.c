@@ -21,12 +21,18 @@ module_param(bridge_major, int, S_IRUGO);
 module_param(bridge_minor, int, S_IRUGO);
 module_param(bridge_nr_devs, int, S_IRUGO);
 
-MODULE_AUTHOR("Jheisson Argiro Lopez Restrepo");
+MODULE_AUTHOR("2K+1");
 MODULE_LICENSE("Dual BSD/GPL");
 
 LIST_HEAD(stack);
 LIST_HEAD(linkedList);
 LIST_HEAD(linkedListConcat);
+
+LIST_HEAD(highPriorityQueue);
+LIST_HEAD(middlePriorityQueue);
+LIST_HEAD(lowPriorityQueue);
+
+
 
 static void add_element_to_stack(char *node_element_msg, struct list_head* head){
 	struct string_node *tmp_element;
@@ -62,23 +68,43 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    return_value = 1;
 	    break;
 	case BRIDGE_W_HIGH_PRIOR_Q:
-    	raw_copy_from_user(message, (char *)arg, 100);
-	    printk(KERN_INFO "message %s\n", message);
+    	printk(KERN_INFO "Inserting value in a high priority queue\n");
+        raw_copy_from_user(message, (char *)arg, 100);
+	    add_element_to_stack(message, &highPriorityQueue);
+        printk(KERN_INFO "Element succesfully added to the queue\n");
 	    break;
 	case BRIDGE_W_MIDDLE_PRIOR_Q:
-	    printk(KERN_INFO "message %s\n", "bla1");
+	    printk(KERN_INFO "Inserting value in a middle priority queue\n");
+        raw_copy_from_user(message, (char *)arg, 100);
+	    add_element_to_stack(message, &middlePriorityQueue);
+        printk(KERN_INFO "Element succesfully added to the queue\n");
 	    break;
 	case BRIDGE_W_LOW_PRIOR_Q:
-	    printk(KERN_INFO "message %s\n", "bla2");
+	    printk(KERN_INFO "Inserting value in a low priority queue\n");
+        raw_copy_from_user(message, (char *)arg, 100);
+	    add_element_to_stack(message, &lowPriorityQueue);
+        printk(KERN_INFO "Element succesfully added to the queue\n");
 	    break;
 	case BRIDGE_R_HIGH_PRIOR_Q:
-        printk(KERN_INFO "message %s\n", "bla3");
+        printk(KERN_INFO "Reading\n");
+	    tmp_element = list_last_entry(&highPriorityQueue, struct string_node, list);
+        list_del(&(tmp_element->list));
+	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
+	    kfree(tmp_element);
 	    break;
 	case BRIDGE_R_MIDDLE_PRIOR_Q:
-        printk(KERN_INFO "message %s\n", "bla4");
+        printk(KERN_INFO "Reading\n");
+	    tmp_element = list_last_entry(&middlePriorityQueue, struct string_node, list);
+        list_del(&(tmp_element->list));
+	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
+	    kfree(tmp_element);
 	    break;
 	case BRIDGE_R_LOW_PRIOR_Q:
-        printk(KERN_INFO "message %s\n", "bla5");
+         printk(KERN_INFO "Reading\n");
+	    tmp_element = list_last_entry(&lowPriorityQueue, struct string_node, list);
+        list_del(&(tmp_element->list));
+	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
+	    kfree(tmp_element);
 	    break;
 	case BRIDGE_STATE_Q:
         printk(KERN_INFO "message %s\n", "bla6");

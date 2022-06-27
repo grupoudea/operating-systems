@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <ctype.h>
 #include "bridgeIO.h"
 #include "bridgeLink.h"
 #include "../constants.h"
@@ -103,4 +105,57 @@ void concatTwoLists(char** firstList, int numFirstList, char** secondList, int n
 void cleanList(char** arrayLines, int numOfLines){
     int fd = callModule();
     write_message(fd, BRIDGE_CLEAN_L, "");
+}
+
+char* getPriorityText(int priority){
+
+    if(priority==1){
+        return "HIGH";
+    }else if(priority == 2){
+        return "MIDDLE";
+    }else if(priority == 3){
+        return "LOW";
+    }else{
+        return "UNKNOWN";
+    }
+}
+
+int isValidInteger(char num[]){
+    for (int i = 0; i < strlen(num); i++)
+    {
+        if(!isdigit(num[i]) ) {
+            printf("Ingrese un numero valido");
+            return 0; //no es numero valido
+        }
+    }
+    return 1;
+}
+
+void priorityQueue(char** arrayLines, int numOfLines, char* priorityP){
+    int opcion = 0;
+    char message[100];
+    char priority[256];
+    long priorityInt = 0;
+    printf("Insert a message with priotity or ESC exit\n1. HIGH\n2. MIDDLE\n3. LOW\n");
+
+    do{
+        printf("Insert message:\n");
+        scanf("%s",&message);
+    }while((strlen(message)<1));
+
+    do{
+        printf("Insert priority (Integer only):\n");
+        scanf("%s",&priority);
+
+        printf(" priority: %s\n", priority);
+        priorityInt = strtol(priority, NULL, 10);
+        printf(" priorityINt: %d\n", priorityInt);
+
+
+        printf("is digit: %d | have prio %d \n", !isValidInteger(priority), (priorityInt<1 || priorityInt>3));
+    }while(!isValidInteger(priority)||(priorityInt<1 || priorityInt>3));
+
+
+    printf("We will store a message %s with priority %s\n",message, getPriorityText(priorityInt));
+
 }

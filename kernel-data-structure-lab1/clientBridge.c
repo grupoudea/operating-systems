@@ -72,6 +72,7 @@ void chooseOption(char* option){
         validarSimetria(linesArray, numOfLines);
 
     }else if(strcmp(COLA_PRIORIDAD, option) == 0){
+        priorityQueue(linesArray, numberOfLines, "TEST");
 
     }else if(strcmp(DESTRUIR_LISTA, option) == 0){
 
