@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <time.h>
 #include "bridgeIO.h"
 #include "bridgeLink.h"
 #include "../constants.h"
@@ -37,6 +39,42 @@ void ordenInverso(char** arrayLines, int numOfLines){
         write_message(fd, BRIDGE_R_S, fileLine);
         printf("%s",fileLine);
     }
+}
+
+int randomNumber(int maxNumber, int seed){
+    int time1 = time(NULL)-((seed+1)*RAND_MAX);
+    srand(time1);// numero aleatorio entre 0 y maxNumber
+    int numberGenerate = (rand() % maxNumber);
+    return numberGenerate;
+}
+
+
+void randomLines(char** arrayLines, const int numOfLines, char* fileName){
+    int fd = callModule();
+
+    for (int i = 0; i < numOfLines; i++){
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+
+    if(numOfLines>=2){
+        int maxRandom = numOfLines;
+        if(numOfLines==2){
+            maxRandom = 2;
+        }
+        for (int i = 0; i < maxRandom; i++){
+            int randomNumberInt = randomNumber(maxRandom,(i));
+            char randomNumberChar[20];
+            sprintf(randomNumberChar, "%d", randomNumberInt);
+            write_message(fd, BRIDGE_RANDOM_L, randomNumberChar);
+        }
+    }
+
+    char fileLine[MAX_LENGTH_CHAR_BRIDGE];
+    for (int i = 0; i < numOfLines; i++){
+        write_message(fd, BRIDGE_R_L, fileLine);
+        printf("Random Lines: %s\n",fileLine);
+    }
+
 }
 
 void rotateToRight(char* numberRotations, char** arrayLines, int numOfLines){
