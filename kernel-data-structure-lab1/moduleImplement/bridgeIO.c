@@ -8,6 +8,12 @@ void write_message(int fd, unsigned long command, char * message){
     }
 }
 
+void write_message_array(int fd, unsigned long command, char ** message){
+    if (ioctl(fd, command, message) == -1){
+        perror("Write message error at ioctl");
+    }
+}
+
 void read_message(int fd, unsigned long command, char * message){
     if(ioctl(fd, command, message) == -1){
 	perror("Read message error at ioctl");

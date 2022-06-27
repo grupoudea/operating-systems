@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "bridgeIO.h"
 #include "bridgeLink.h"
 #include "../constants.h"
@@ -39,8 +42,33 @@ void ordenInverso(char** arrayLines, int numOfLines){
     }
 }
 
-void randomLine(char** file, int numOfLines, char* fileName){
-    
+int randomNumber(int maxNumber){
+    int time1 = time(NULL);
+    srand(time1);// numero aleatorio entre 1 y maxNUmber
+    int numberGenerate = (rand() % maxNumber)+1;
+    sleep(1);
+    return numberGenerate;
+}
+
+
+void randomLines(char** arrayLines, int numOfLines, char* fileName){
+    int fd = callModule();
+
+    for (int i = 0; i < numOfLines; i++){
+        printf("%s", arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    //revuelve la lista
+    for (int i = 0; i < numOfLines; i++){
+        int randomNumberInt = randomNumber(numOfLines);
+        char randomNumberChar[20];
+        sprintf(randomNumberChar, "%d", randomNumberInt);
+        printf("Numero random: %s\n", randomNumberChar);
+
+        //printf("%s", arrayLines[i]);
+        write_message(fd, BRIDGE_RANDOM_L, randomNumberChar);
+    }
+
 }
 
 void rotateToRight(char* numberRotations, char** arrayLines, int numOfLines){

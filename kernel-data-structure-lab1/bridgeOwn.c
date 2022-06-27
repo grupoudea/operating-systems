@@ -170,6 +170,28 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	case BRIDGE_STATE_L:
         printk(KERN_INFO "message %s\n", "bla23");
 	    break;
+	case BRIDGE_RANDOM_L:
+		printk(KERN_INFO "------------ BRIDGE_RANDOM_L REVOLVER LA LISTA \n");
+		long numberRandom;
+		raw_copy_from_user(message, (char* )arg, 20);
+		kstrtol(message, 10, &numberRandom);
+
+		printk(KERN_INFO "Message: %s\n", message);
+
+        printk(KERN_INFO "message BRIDGE_RANDOM_L numberRandom = %d\n", numberRandom);
+		printk(KERN_INFO "------------------------------------------------------------------\n\n");
+		int iteratorRandom = 0;
+		while (iteratorRandom < 2){ //1
+			struct list_head *head = &stack;
+			struct list_head *targetNode;
+			if (!list_empty(head)) {
+				targetNode = head->next;// targetNode 
+				list_swap(targetNode, targetNode->next);
+				//list_move_tail(first, head);
+			}
+			iteratorRandom++;
+		}
+	    break;
 	case BRIDGE_DESTROY_L:
         printk(KERN_INFO "message %s\n", "bla24");
     }

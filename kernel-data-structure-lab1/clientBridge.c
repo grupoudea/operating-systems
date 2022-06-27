@@ -66,10 +66,10 @@ void chooseOption(char* option){
         ordenInverso(linesArray, numOfLines);
 
     }else if(strcmp(RANDOM, option) == 0){
-        randomLines(linesArray, numOfLines);
+        randomLines(linesArray, numOfLines, pathfile);
 
     }else if(strcmp(VALIDAR_SIMETRIA, option) == 0){
-      validarSimetria(linesArray, numOfLines);
+        validarSimetria(linesArray, numOfLines);
 
     }else if(strcmp(COLA_PRIORIDAD, option) == 0){
 
