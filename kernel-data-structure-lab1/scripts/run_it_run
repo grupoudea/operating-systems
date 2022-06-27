@@ -1,0 +1,26 @@
+#!/bin/sh
+DESTITATION=/usr/local/bin
+SOURCE=$PWD
+
+echo "$PWD"
+echo "Creating links..."
+
+# ln -s SRC DST
+ln -s $SOURCE/scripts/bridge_load $DESTITATION/bridge_load
+
+ln -s $SOURCE/scripts/bridge_unload $DESTITATION/bridge_unload
+
+ln -s $SOURCE/scripts/bridge_syslog_clean $DESTITATION/bridge_syslog_clean
+
+ln -s $SOURCE/scripts/bridge_reset $DESTITATION/bridge_reset
+
+ln -s $SOURCE/clientBridge $DESTITATION/clientBridge
+
+ln -s $SOURCE/scripts/compile_client $DESTITATION/compile_client
+
+ln -s $SOURCE/scripts/bridge_status $DESTITATION/bridge_status
+
+
+echo "The process has finished"
+exit
+
