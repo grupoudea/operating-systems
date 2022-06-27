@@ -46,4 +46,4 @@ void read_int(int fd, unsigned long command, int * value);
 
 int send_empty_command(int fd, unsigned long command);
 void write_several_messages(int fd);
-void read_all_messages(int fd);
+void read_all_messages(int fd, unsigned long command);

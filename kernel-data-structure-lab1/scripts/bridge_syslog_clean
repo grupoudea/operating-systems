@@ -1,4 +1,7 @@
 #!/bin/sh
+FECHA=$(date +%Y-%m-%d)
+echo "$FECHA"
 echo "1. Cleaning syslog file..."
+cat /var/log/syslog >> /var/log/syslog-bkp-$FECHA
 cat /dev/null > /var/log/syslog
 echo "2. Syslog file has been cleaned"

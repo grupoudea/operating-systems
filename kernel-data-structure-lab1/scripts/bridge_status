@@ -1,0 +1,4 @@
+#!/bin/sh
+module="bridgeOwn"
+echo "Module status"
+sudo lsmod | grep $module

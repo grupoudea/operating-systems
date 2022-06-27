@@ -19,6 +19,27 @@ Esta práctica también nos permitirá aprender a utilizar ciertas funciones que
 
 ## Commands
 
+### Other way to compile module bridgeOwn and clientBridge
+
+firstly, go to the folder /**kernel-data-structure-lab1** inside the project, run the command **sudo ./scripts/run_it_run**, this command will create symbolic links or just links to access in an easier way to commands like: bridge_load, bridge_reset also to clientBridge executable easier.
+
+Now, if you want execute clientBridge you just to write:
+
+```sh
+sudo clientBridge
+```
+
+Here, command list:
+
+- **sudo bridge_status** => show if the module is on.
+- **sudo bridge_load** => load the module.
+- **sudo bridge_reset** => reset the module, but before, unload the module, it execute the make command and finally load the module again.
+- **sudo bridge_syslog_clean** => clean the syslog in /var/log/syslog. Don't worry it will make a backup.
+- **sudo compile_client** => compile the clientBridge from **kernel-data-structure-lab1** only. It will replace with Makefile in future versions.
+
+Some of these commands work just if you are in the **kernel-data-structure-lab1** path in his terminal or console.
+
+
 
 ### To compile module bridgeOwn
 
@@ -33,9 +54,6 @@ make
 ### To compile client
 
 ```sh
-gcc -o clientBridge clientBridge.c
-
-gcc -o clientBridge clientBridge.c utilsClientBridge.c
 
 gcc -o clientBridge clientBridge.c utilsClientBridge.c moduleImplement/bridgeLink.c moduleImplement/bridgeIO.c
 

@@ -1,7 +1,0 @@
-#!/bin/sh
-echo "1. Removing module..."
-sudo ./bridge_unload
-echo "2. Compiling module..."
-make
-echo "3. loading module into kernel..."
-sudo ./bridge_load
