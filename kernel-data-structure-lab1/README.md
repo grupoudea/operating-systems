@@ -31,13 +31,29 @@ sudo clientBridge
 
 Here, command list:
 
-- **sudo bridge_status** => show if the module is on.
-- **sudo bridge_load** => load the module.
-- **sudo bridge_reset** => reset the module, but before, unload the module, it execute the make command and finally load the module again.
-- **sudo bridge_syslog_clean** => clean the syslog in /var/log/syslog. Don't worry it will make a backup.
-- **sudo compile_client** => compile the clientBridge from **kernel-data-structure-lab1** only. It will replace with Makefile in future versions.
+```sh
+sudo bridge_status
+```
+=> show if the module is on.
+```sh
+sudo bridge_load
+```
+=> load the module.
+```sh
+sudo bridge_reset
+```
+=> reset the module, but before, unload the module, it execute the make command and finally load the module again.
+```sh
+sudo bridge_syslog_clean
+```
+=> clean the syslog in /var/log/syslog. Don't worry it will make a backup.
 
-Some of these commands work just if you are in the **kernel-data-structure-lab1** path in his terminal or console.
+```sh
+sudo compile_client
+```
+=> compile the clientBridge from **kernel-data-structure-lab1** only. It will replace with Makefile in future versions.
+
+Note: Some of these commands work just if you are in the **kernel-data-structure-lab1** path in his terminal or console.
 
 
 
