@@ -33,14 +33,14 @@ void ordenInverso(char** arrayLines, int numOfLines){
     printf("\n######  Lineas del archivo orden original   ######\n");
     int fd = callModule();
     for (int i = 0; i < numOfLines; i++){
-        printf("%s",arrayLines[i]);
+        printf("%s \n",arrayLines[i]);
         write_message(fd, BRIDGE_W_S, arrayLines[i]);
     }
     char fileLine[MAX_LENGTH_CHAR_BRIDGE];
     printf("\n######  Lineas del archivo orden inverso   ######\n");
     for (int i = 0; i < numOfLines; i++){
         write_message(fd, BRIDGE_R_S, fileLine);
-        printf("%s",fileLine);
+        printf("%s \n",fileLine);
     }
 }
 
@@ -120,5 +120,23 @@ void cleanList(char** arrayLines, int numOfLines){
         read_message(fd, BRIDGE_R_L, valor);
         printf("%s \n", valor);
     }
-   
+}
+
+void destroyList(char** arrayLines, int numOfLines){
+    printf("DESTRUYE UNA LISTA COMPLETAMENTE\n\n");
+    int fd = callModule();
+    for (int i = 0; i < numOfLines; i++){
+        printf("%s \n", arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    char valor[MAX_LENGTH_CHAR_BRIDGE];
+    read_message(fd, BRIDGE_DESTROY_L, "");
+    for (int i = 0; i < numOfLines; i++){
+        read_message(fd, BRIDGE_R_L, valor);
+        if(strcmp(valor, "void") == 0){
+            printf("LISTA DESTRIUDA\n\n");
+            break;
+        }
+        printf("%s \n", valor);
+    }
 }
