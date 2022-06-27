@@ -118,7 +118,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    break;
 	case BRIDGE_W_L:
 		raw_copy_from_user(message, (char *)arg, 100);
-		printk(KERN_INFO "AGREGANDO ELEMENTO A LA LISTA STACK: message = %s\n", message);
+		//printk(KERN_INFO "AGREGANDO ELEMENTO A LA LISTA STACK: message = %s\n", message);
 	  	add_element_to_stack(message, &stack);
 	    break;
 	case BRIDGE_R_L:
@@ -177,19 +177,17 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 		long numberRandom;
 		raw_copy_from_user(message, (char* )arg, 20);
 		kstrtol(message, 10, &numberRandom);
-
-		printk(KERN_INFO "Message: %s\n", message);
-
         printk(KERN_INFO "message BRIDGE_RANDOM_L numberRandom = %d\n", numberRandom);
 		printk(KERN_INFO "------------------------------------------------------------------\n\n");
 		int iteratorRandom = 0;
-		while (iteratorRandom < 2){ //1
-			struct list_head *head = &stack;
-			struct list_head *targetNode;
-			if (!list_empty(head)) {
-				targetNode = head->next;// targetNode 
-				list_swap(targetNode, targetNode->next);
-				//list_move_tail(first, head);
+
+		struct string_node *tmp_element;
+		struct list_head *watch, *next;
+		list_for_each_safe(watch, next, &stack){
+			tmp_element = list_entry(watch, struct string_node, list);
+			if(numberRandom>0 && iteratorRandom == numberRandom){
+				list_swap(watch, watch->next);
+				break;
 			}
 			iteratorRandom++;
 		}

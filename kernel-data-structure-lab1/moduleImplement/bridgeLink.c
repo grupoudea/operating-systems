@@ -2,8 +2,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <unistd.h>
-
+#include <time.h>
 #include "bridgeIO.h"
 #include "bridgeLink.h"
 #include "../constants.h"
@@ -42,31 +41,38 @@ void ordenInverso(char** arrayLines, int numOfLines){
     }
 }
 
-int randomNumber(int maxNumber){
-    int time1 = time(NULL);
-    srand(time1);// numero aleatorio entre 1 y maxNUmber
-    int numberGenerate = (rand() % maxNumber)+1;
-    sleep(1);
+int randomNumber(int maxNumber, int seed){
+    int time1 = time(NULL)-((seed+1)*RAND_MAX);
+    srand(time1);// numero aleatorio entre 0 y maxNumber
+    int numberGenerate = (rand() % maxNumber);
     return numberGenerate;
 }
 
 
-void randomLines(char** arrayLines, int numOfLines, char* fileName){
+void randomLines(char** arrayLines, const int numOfLines, char* fileName){
     int fd = callModule();
 
     for (int i = 0; i < numOfLines; i++){
-        printf("%s", arrayLines[i]);
         write_message(fd, BRIDGE_W_L, arrayLines[i]);
     }
-    //revuelve la lista
-    for (int i = 0; i < numOfLines; i++){
-        int randomNumberInt = randomNumber(numOfLines);
-        char randomNumberChar[20];
-        sprintf(randomNumberChar, "%d", randomNumberInt);
-        printf("Numero random: %s\n", randomNumberChar);
 
-        //printf("%s", arrayLines[i]);
-        write_message(fd, BRIDGE_RANDOM_L, randomNumberChar);
+    if(numOfLines>=2){
+        int maxRandom = numOfLines;
+        if(numOfLines==2){
+            maxRandom = 2;
+        }
+        for (int i = 0; i < maxRandom; i++){
+            int randomNumberInt = randomNumber(maxRandom,(i));
+            char randomNumberChar[20];
+            sprintf(randomNumberChar, "%d", randomNumberInt);
+            write_message(fd, BRIDGE_RANDOM_L, randomNumberChar);
+        }
+    }
+
+    char fileLine[MAX_LENGTH_CHAR_BRIDGE];
+    for (int i = 0; i < numOfLines; i++){
+        write_message(fd, BRIDGE_R_L, fileLine);
+        printf("Random Lines: %s\n",fileLine);
     }
 
 }

@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "1. Cleaning syslog file..."
+cat /dev/null > /var/log/syslog
+echo "2. Syslog file has been cleaned"

@@ -8,7 +8,7 @@ void write_message(int fd, unsigned long command, char * message){
     }
 }
 
-void write_message_array(int fd, unsigned long command, char ** message){
+void write_message_array(int fd, unsigned long command, char** message){
     if (ioctl(fd, command, message) == -1){
         perror("Write message error at ioctl");
     }
@@ -60,10 +60,10 @@ void write_several_messages(int fd){
     write_message(fd, BRIDGE_W_S, "Message 3");
 }
 
-void read_all_messages(int fd){
+void read_all_messages(int fd, unsigned long command){
 	char message[100];
 	while( send_empty_command(fd, BRIDGE_STATE_S) > 0){
-	    read_message(fd, BRIDGE_R_S, message);
+	    read_message(fd, command, message);
 	    printf("Message: %s\n", message);
 	}
 }
