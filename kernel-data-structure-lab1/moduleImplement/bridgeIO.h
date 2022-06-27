@@ -31,6 +31,8 @@
 #define BRIDGE_CONCAT_L _IO('p', 23)
 #define BRIDGE_STATE_L _IO('p', 24)
 #define BRIDGE_DESTROY_L _IO('p', 25)
+#define BRIDGE_RANDOM_L _IO('p', 26)
+
 
 #endif
 
@@ -44,4 +46,4 @@ void read_int(int fd, unsigned long command, int * value);
 
 int send_empty_command(int fd, unsigned long command);
 void write_several_messages(int fd);
-void read_all_messages(int fd);
+void read_all_messages(int fd, unsigned long command);

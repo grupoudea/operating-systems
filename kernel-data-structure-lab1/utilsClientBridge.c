@@ -16,7 +16,7 @@ void killClientBridge(char* message){
     exit(-1);
 }
 
-char** readFile(char* fileName,int *numOfLines){
+char** readFile(char* fileName, int* numOfLines){
     FILE* inputFile = fopen(fileName, "r");
     if (!inputFile){
         exit(EXIT_FAILURE);
