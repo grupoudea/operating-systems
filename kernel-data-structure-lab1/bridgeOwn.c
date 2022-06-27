@@ -149,14 +149,18 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    break;
 	case BRIDGE_W_L:
 		raw_copy_from_user(message, (char *)arg, 100);
-		//printk(KERN_INFO "AGREGANDO ELEMENTO A LA LISTA STACK: message = %s\n", message);
 	  	add_element_to_stack(message, &stack);
 	    break;
 	case BRIDGE_R_L:
-		tmp_element = list_last_entry(&stack, struct string_node, list);
-        list_del(&(tmp_element->list));
-	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
-	    kfree(tmp_element);
+		if(list_empty(&stack) != 0){
+			printk(KERN_INFO "LISTA VACIA \n");
+			raw_copy_to_user((char *)arg, "void", 100);
+	    }else{
+			tmp_element = list_last_entry(&stack, struct string_node, list);
+			list_del(&(tmp_element->list));
+			raw_copy_to_user((char *)arg, tmp_element->message, 100);
+			kfree(tmp_element);
+	    }
 	    break;
 	case BRIDGE_INVERT_L:
         printk(KERN_INFO "message %s\n", "bla16");
@@ -242,7 +246,9 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 		}
 	    break;
 	case BRIDGE_DESTROY_L:
-        printk(KERN_INFO "message %s\n", "bla24");
+        printk(KERN_INFO "DESTRIUR LISTA");
+		cleanAllListElements(&stack);		
+		printk(KERN_INFO "--------------------------\n");
     }
     return return_value;
 }
