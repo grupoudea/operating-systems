@@ -25,13 +25,15 @@ MODULE_AUTHOR("Jheisson Argiro Lopez Restrepo");
 MODULE_LICENSE("Dual BSD/GPL");
 
 LIST_HEAD(stack);
+LIST_HEAD(linkedList);
+LIST_HEAD(linkedListConcat);
 
-static void add_element_to_stack(char *node_element_msg){
+static void add_element_to_stack(char *node_element_msg, struct list_head* head){
 	struct string_node *tmp_element;
 	tmp_element = kmalloc(sizeof(struct string_node), GFP_KERNEL);
 	strcpy(tmp_element->message, node_element_msg);
 	INIT_LIST_HEAD(&tmp_element->list);
-	list_add(&(tmp_element->list), &stack);
+	list_add(&(tmp_element->list), head);
 }
 
 void mylist_exit(void){
@@ -90,7 +92,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	case BRIDGE_W_S:
 		printk(KERN_INFO "Creating\n");
         raw_copy_from_user(message, (char *)arg, 100);
-	    add_element_to_stack(message);
+	    add_element_to_stack(message, &stack);
         printk(KERN_INFO "Element succesfully added to the stack\n");
 	    break;
 	case BRIDGE_R_S:
@@ -117,7 +119,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	case BRIDGE_W_L:
 		raw_copy_from_user(message, (char *)arg, 100);
 		printk(KERN_INFO "AGREGANDO ELEMENTO A LA LISTA STACK: message = %s\n", message);
-	  	add_element_to_stack(message);
+	  	add_element_to_stack(message, &stack);
 	    break;
 	case BRIDGE_R_L:
 		/*ESTO RECORRE TODOS LOS REGISTROS DE LA LISTA STACK
