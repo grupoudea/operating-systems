@@ -45,7 +45,7 @@ int send_empty_command(int fd, unsigned long command){
     if( result == -1){
        perror("Send command error at ioctl");
     }else{
-        printf("Command OK to the kernel\n");
+        //printf("Command OK to the kernel\n");
     }
     return result;
 }

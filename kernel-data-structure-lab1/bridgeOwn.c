@@ -25,8 +25,8 @@ MODULE_AUTHOR("Jheisson Argiro Lopez Restrepo");
 MODULE_LICENSE("Dual BSD/GPL");
 
 LIST_HEAD(stack);
-LIST_HEAD(linkedList);
-LIST_HEAD(linkedListConcat);
+LIST_HEAD(linkedList);// TODO:no se usa ?
+LIST_HEAD(linkedListConcat);//TODO:no se usa ?
 
 static void add_element_to_stack(char *node_element_msg, struct list_head* head){
 	struct string_node *tmp_element;
@@ -65,6 +65,7 @@ void cleanAllListElements(struct list_head* head){
        	list_del(&(tmp_element->list));
 		kfree(tmp_element);
    	}
+	printk(KERN_INFO "Stack destroyed successfuly ");
 }
 
 int listLength(struct list_head* head){
@@ -134,15 +135,13 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    kfree(tmp_element);
 	    break;
 	case BRIDGE_STATE_S:
-        if(list_empty(&stack) != 0){
-			return_value = 0;
-	    }else{
-			return_value = 1;
-	    }
-	    printk(KERN_INFO "Stack state succesfully sended!!!\n");
+		//return_value=list_empty(&stack);
+		return_value=listLength(&stack);
+	    printk(KERN_INFO "Stack state succesfully sended !!!\n");
 	    break;
 	case BRIDGE_DESTROY_S:
-        printk(KERN_INFO "message %s\n", "bla12");
+		printk(KERN_INFO "Destroying stack"); 
+		cleanAllListElements(&stack);
 	    break;
 	case BRIDGE_CREATE_L:
         printk(KERN_INFO "message %s\n", "bla13");
