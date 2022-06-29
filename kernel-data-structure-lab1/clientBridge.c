@@ -61,7 +61,7 @@ void chooseOption(char* option){
     char* pathfile = getPathFile();
     int numOfLines = 0;
     char** linesArray = readFile(pathfile, &numOfLines);
-
+    
     if(strcmp(ORDEN_INVERSO, option) == 0){
         ordenInverso(linesArray, numOfLines);
 
@@ -69,7 +69,7 @@ void chooseOption(char* option){
         randomLines(linesArray, numOfLines, pathfile);
 
     }else if(strcmp(VALIDAR_SIMETRIA, option) == 0){
-        validarSimetria(linesArray, numOfLines);
+       validarSimetria(linesArray, numOfLines);
 
     }else if(strcmp(COLA_PRIORIDAD, option) == 0){
 
