@@ -29,10 +29,14 @@ char** readFile(char* fileName, int* numOfLines){
     size_t len = 0;
     int i = 0;
     while (getline(&contents, &len, inputFile) != -1){
-        int cm = stringLength(contents);
-        char* newChars = (char*)malloc(cm);
+        int lineLength = stringLength(contents);
+        char* newChars = (char*)malloc(lineLength);
+        int len = strlen(contents);
+        if(contents[len - 1] == '\n'){
+            contents[len - 1] = '\0';
+        }
         strcpy(newChars, contents);
-        arrayChars[i] = (char*)malloc(cm);
+        arrayChars[i] = (char*)malloc(lineLength);
         arrayChars[i] = newChars;
         i++;
     }
@@ -60,7 +64,7 @@ int numberOfLines(FILE* file, int* size){
             i++;
         }
         if(character == EOF){
-            i++;
+            // i++;
             *size = i;
             break;
         }

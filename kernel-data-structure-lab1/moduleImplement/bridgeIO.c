@@ -16,9 +16,7 @@ void write_message_array(int fd, unsigned long command, char** message){
 
 void read_message(int fd, unsigned long command, char * message){
     if(ioctl(fd, command, message) == -1){
-	perror("Read message error at ioctl");
-    }else{
-	printf("Copy the messsage from the kernel\n");
+	    perror("Read message error at ioctl");
     }
 }
 
@@ -39,8 +37,6 @@ void write_int(int fd, unsigned long command, int * value){
 void read_int(int fd, unsigned long command, int * value){
     if(ioctl(fd, command, value) == -1){
         perror("Read int error at ioctl");
-    }else{
-        printf("Copy the int from the kernel\n");
     }
 }
 
@@ -49,7 +45,7 @@ int send_empty_command(int fd, unsigned long command){
     if( result == -1){
        perror("Send command error at ioctl");
     }else{
-        printf("Command OK to the kernel\n");
+        //printf("Command OK to the kernel\n");
     }
     return result;
 }

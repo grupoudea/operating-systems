@@ -25,8 +25,8 @@ MODULE_AUTHOR("2K+1");
 MODULE_LICENSE("Dual BSD/GPL");
 
 LIST_HEAD(stack);
-LIST_HEAD(linkedList);
-LIST_HEAD(linkedListConcat);
+LIST_HEAD(linkedList);// TODO:no se usa ?
+LIST_HEAD(linkedListConcat);//TODO:no se usa ?
 
 LIST_HEAD(highPriorityQueue);
 LIST_HEAD(middlePriorityQueue);
@@ -42,6 +42,16 @@ static void add_element_to_stack(char *node_element_msg, struct list_head* head)
 	list_add(&(tmp_element->list), head);
 }
 
+static void read_all_list(struct list_head* head, char* nameList){
+	struct string_node *tmp_element;
+	struct list_head *watch, *next;
+	list_for_each_safe(watch, next, head){
+		tmp_element = list_entry(watch, struct string_node, list);
+		char* valor = tmp_element->message;
+		printk(KERN_INFO "%s : VALOR = %s", nameList, valor);
+	}
+}
+
 void mylist_exit(void){
     struct string_node *tmp_element;
 	struct list_head *watch, *next;
@@ -53,6 +63,27 @@ void mylist_exit(void){
     //kfree(&stack);
 }
 
+void cleanAllListElements(struct list_head* head){
+ 	struct string_node *tmp_element;
+	struct list_head *watch, *next;
+	list_for_each_safe(watch, next, head){
+       	tmp_element = list_entry(watch, struct string_node, list);
+       	list_del(&(tmp_element->list));
+		kfree(tmp_element);
+   	}
+	printk(KERN_INFO "Stack destroyed successfuly ");
+}
+
+int listLength(struct list_head* head){
+	struct string_node *tmp_element;
+	struct list_head *watch, *next;
+	int cantidadRegistros = 0;
+	list_for_each_safe(watch, next, head){
+       	cantidadRegistros++;
+   	}
+	return cantidadRegistros;
+}
+
 struct bridge_dev *bridge_devices;	/* allocated in bridge_init_module */
 
 static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
@@ -60,7 +91,8 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
     int data;
     char message[100];
     struct string_node *tmp_element;
-	printk("llego al kernel");
+	struct list_head *watch, *next;
+
     switch(cmd){
 	case BRIDGE_CREATE_Q:
         printk(KERN_INFO "message %s\n", "bla");
@@ -129,48 +161,40 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    kfree(tmp_element);
 	    break;
 	case BRIDGE_STATE_S:
-        if(list_empty(&stack) != 0){
-			return_value = 0;
-	    }else{
-			return_value = 1;
-	    }
-	    printk(KERN_INFO "Stack state succesfully sended!!!\n");
+		//return_value=list_empty(&stack);
+		return_value=listLength(&stack);
+	    printk(KERN_INFO "Stack state succesfully sended !!!\n");
 	    break;
 	case BRIDGE_DESTROY_S:
-        printk(KERN_INFO "message %s\n", "bla12");
+		printk(KERN_INFO "Destroying stack"); 
+		cleanAllListElements(&stack);
 	    break;
 	case BRIDGE_CREATE_L:
         printk(KERN_INFO "message %s\n", "bla13");
 	    break;
 	case BRIDGE_W_L:
 		raw_copy_from_user(message, (char *)arg, 100);
-		//printk(KERN_INFO "AGREGANDO ELEMENTO A LA LISTA STACK: message = %s\n", message);
 	  	add_element_to_stack(message, &stack);
 	    break;
 	case BRIDGE_R_L:
-		/*ESTO RECORRE TODOS LOS REGISTROS DE LA LISTA STACK
-		struct string_node *tmp_element;
-		struct list_head *watch, *next;
-		list_for_each_safe(watch, next, &stack){
-			tmp_element = list_entry(watch, struct string_node, list);
-			char* valor = tmp_element->message;
-			printk(KERN_INFO "VALOR = %s\n", valor);
-		}*/
-		tmp_element = list_last_entry(&stack, struct string_node, list);
-        list_del(&(tmp_element->list));
-	    raw_copy_to_user((char *)arg, tmp_element->message, 100);
-	    kfree(tmp_element);
+		if(list_empty(&stack) != 0){
+			printk(KERN_INFO "LISTA VACIA \n");
+			raw_copy_to_user((char *)arg, "void", 100);
+	    }else{
+			tmp_element = list_last_entry(&stack, struct string_node, list);
+			list_del(&(tmp_element->list));
+			raw_copy_to_user((char *)arg, tmp_element->message, 100);
+			kfree(tmp_element);
+	    }
 	    break;
 	case BRIDGE_INVERT_L:
         printk(KERN_INFO "message %s\n", "bla16");
 	    break;
 	case BRIDGE_ROTATE_L:
-		printk(KERN_INFO "------------ BRIDGE_ROTATE_L ROTAR LA LISTA \n");
+		printk(KERN_INFO "ROTAR LA LISTA \n");
 		raw_copy_from_user(message, (char*)arg, 100);
 		long numberRotations;
 		kstrtol(message, 10, &numberRotations);
-        printk(KERN_INFO "message BRIDGE_ROTATE_L numberRotations = %d\n", numberRotations);
-		printk(KERN_INFO "------------------------------------------------------------------\n\n");
 		int i = 0;
 		while (i < numberRotations){
 			struct list_head *head = &stack;
@@ -183,7 +207,35 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 		}
 	    break;
 	case BRIDGE_CLEAN_L:
-        printk(KERN_INFO "message BRIDGE_CLEAN_L %s\n", "bla18");
+        printk(KERN_INFO "LIMPIAR LA LISTA \n");
+		read_all_list(&stack, "stack");
+		printk(KERN_INFO "--------------------------\n");
+		
+		list_for_each_safe(watch, next, &stack){
+			tmp_element = list_entry(watch, struct string_node, list);
+			char* valor = tmp_element->message;
+			struct string_node *tmpElementLinkedList;
+			struct list_head *watchLinkedList, *nextLinkedList;
+			int esDuplicado = 0;
+			list_for_each_safe(watchLinkedList, nextLinkedList, &stack){
+				tmpElementLinkedList = list_entry(watchLinkedList, struct string_node, list);
+				char* valorLinkedList = tmpElementLinkedList->message;
+				if(&(tmp_element->message) != &(tmpElementLinkedList->message)){
+					if(strcmp(valor, valorLinkedList) == 0){
+						esDuplicado = 1;
+					}
+				}
+			}
+			if(esDuplicado == 1){
+				list_del(&(tmp_element->list));
+				kfree(tmp_element);
+			}
+		}
+		read_all_list(&stack, "stack");
+		int n = listLength(&stack);
+		char cantidadRegistros[100];
+		sprintf(cantidadRegistros, "%d", n);
+		raw_copy_to_user((char *)arg, cantidadRegistros, 100);
 	    break;
 	case BRIDGE_GREATER_VAL_L:
 	    //strcpy((char *)arg, "MensajePrueba");
@@ -219,7 +271,9 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 		}
 	    break;
 	case BRIDGE_DESTROY_L:
-        printk(KERN_INFO "message %s\n", "bla24");
+        printk(KERN_INFO "DESTRIUR LISTA");
+		cleanAllListElements(&stack);		
+		printk(KERN_INFO "--------------------------\n");
     }
     return return_value;
 }

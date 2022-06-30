@@ -8,7 +8,6 @@ group="sudo"
 echo "     Loading module from Load Script"
 # invoke insmod with all arguments we got
 # and use a pathname, as insmod doesn't look in . by default
-echo "$PWD"
 /sbin/insmod ./$module.ko $* || exit 1
 
 # retrieve major number
