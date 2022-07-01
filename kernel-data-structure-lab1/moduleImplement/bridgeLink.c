@@ -91,6 +91,22 @@ int randomNumber(int maxNumber, int seed){
     return numberGenerate;
 }
 
+void invertirLista(char **arrayLines, int numOfLines){
+    int fd = callModule();
+    printf("\n######  Creating list  ######\n");
+    for (int i = 0; i < numOfLines; i++){
+        //printf("%s \n",arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    printf("\n######  list created  ######\n");
+   
+    send_empty_command(fd, BRIDGE_INVERT_L);
+    printf("\n######  list inversed , see details in Kernel  ######\n");
+  
+    send_empty_command(fd, BRIDGE_DESTROY_L);
+    printf("\n######  list destroyed  ######\n");
+}
+
 
 void randomLines(char** arrayLines, const int numOfLines, char* fileName){
     int fd = callModule();
