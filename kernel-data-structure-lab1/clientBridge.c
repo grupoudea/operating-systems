@@ -88,7 +88,7 @@ void chooseOption(char* option){
     }else if(strcmp(LIMPIAR_LISTA, option) == 0){
         cleanList(linesArray, numOfLines);
     }else if(strcmp(MAYOR, option) == 0){
-
+        greatherValue(linesArray, numOfLines);
     }else{
         usageMenu();
     }

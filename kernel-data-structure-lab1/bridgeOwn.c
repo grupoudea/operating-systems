@@ -41,6 +41,7 @@ static void add_element_to_stack(char *node_element_msg, struct list_head* head)
 }
 
 static void read_all_list(struct list_head* head, char* nameList){
+	printk(KERN_INFO "Getting list LIFO");
 	struct string_node *tmp_element;
 	struct list_head *watch, *next;
 	list_for_each_safe(watch, next, head){
@@ -194,6 +195,8 @@ void reverseList(void){
 	// read_all_list(&stack,"stack");
 }
 
+
+
 struct bridge_dev *bridge_devices;	/* allocated in bridge_init_module */
 
 static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
@@ -280,7 +283,7 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	case BRIDGE_INVERT_L:
 		reverseList();
 		printk(KERN_INFO "list inverted\n");
-        read_all_list_reverse(&stack, "stack");
+        read_all_list(&stack, "stack");
 		printk(KERN_INFO "--------------------------\n");
 	    break;
 	case BRIDGE_ROTATE_L:
@@ -331,8 +334,22 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 		raw_copy_to_user((char *)arg, cantidadRegistros, 100);
 	    break;
 	case BRIDGE_GREATER_VAL_L:
-	    //strcpy((char *)arg, "MensajePrueba");
-        printk(KERN_INFO "message %s\n", "bla19");
+		char maxValue[100];
+		char * p =maxValue;
+		strncpy(maxValue,"",sizeof(maxValue));
+	    list_for_each_safe(watch, next, &stack){
+			tmp_element = list_entry(watch, struct string_node, list);
+			char* valor = tmp_element->message;
+			
+			if(strcmp(valor,p)>0)
+			{
+				printk(KERN_INFO "new maxvalue : %s , old maxvalue : %s",valor,p);
+				p =valor;
+				printk(KERN_INFO "new maxvalue : %s" ,p);
+			}
+		}
+		raw_copy_to_user((char *)arg, p, 100);	
+		printk(KERN_INFO "--------------------------\n");
 	    break;
 	case BRIDGE_END_L:
         printk(KERN_INFO "message %s\n", "bla21");

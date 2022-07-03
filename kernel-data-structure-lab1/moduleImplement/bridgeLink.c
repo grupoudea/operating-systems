@@ -93,20 +93,42 @@ int randomNumber(int maxNumber, int seed){
 
 void invertirLista(char **arrayLines, int numOfLines){
     int fd = callModule();
-    printf("\n######  Creating list  ######\n");
+    printf("\n---------  Original list  --------\n");
     for (int i = 0; i < numOfLines; i++){
-        //printf("%s \n",arrayLines[i]);
+        printf("(%d)%s \n",i,arrayLines[i]);
         write_message(fd, BRIDGE_W_L, arrayLines[i]);
     }
-    printf("\n######  list created  ######\n");
+    printf("\n------------------------\n");
    
     send_empty_command(fd, BRIDGE_INVERT_L);
-    printf("\n######  list inversed , see details in Kernel  ######\n");
+    printf("\n*****  list inverted , see details in Kernel  ********\n");
   
-    send_empty_command(fd, BRIDGE_DESTROY_L);
-    printf("\n######  list destroyed  ######\n");
+    // send_empty_command(fd, BRIDGE_DESTROY_L);
+    // printf("\n######  list destroyed  ######\n");
+    printf("\n---------  New list  --------\n");
+    char valor[MAX_LENGTH_CHAR_BRIDGE];
+    for (int i = 0; i < numOfLines; i++){
+        read_message(fd, BRIDGE_R_L, valor);
+        printf("(%d) %s \n",i, valor);
+    }
+    printf("\n------------------------\n");
 }
 
+void greatherValue(char **arrayLines, int numOfLines){
+    int fd = callModule();
+    
+    printf("\n---------  Original list  --------\n");
+    for (int i = 0; i < numOfLines; i++){
+        printf("(%d)%s  \n", i,arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    printf("\n------------------------\n");
+    char  value [MAX_LENGTH_CHAR_BRIDGE];
+    printf("\n---------  Greather value --------\n");
+    write_message(fd, BRIDGE_GREATER_VAL_L, value);  
+    printf("Greather value : %s \n",value);
+    send_empty_command(fd,BRIDGE_DESTROY_L);     
+}
 
 void randomLines(char** arrayLines, const int numOfLines, char* fileName){
     int fd = callModule();
