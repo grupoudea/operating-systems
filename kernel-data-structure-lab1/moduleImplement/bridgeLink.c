@@ -25,16 +25,12 @@ void validarSimetria(char **file,int numOfLines){
     printf("numero de lineas : %d \n",numOfLines);
     char line[MAX_LENGTH_CHAR_BRIDGE];
     int fd = callModule();
-    // int value = send_empty_command(fd,BRIDGE_CREATE_S);
-    // printf("valores en la pila : %d",value);
-    // int value = send_empty_command(fd,BRIDGE_DESTROY_S);
-    //  printf("valores en la pila : %d",value);
+
     for (int i = 0; i < numOfLines; i++){
         char *line= file[i];
         for (int j = 0; j < strlen(line); j++){
             if(line[j]=='{' | line[j]=='('){
                 char tmp[2] = {line[j],'\0'} ;
-                //printf("%s",tmp);
                 write_message(fd, BRIDGE_W_S, tmp);
             }
             else if(line[j]=='}' | line[j]==')'){
@@ -102,9 +98,7 @@ void invertirLista(char **arrayLines, int numOfLines){
    
     send_empty_command(fd, BRIDGE_INVERT_L);
     printf("\n*****  list inverted , see details in Kernel  ********\n");
-  
-    // send_empty_command(fd, BRIDGE_DESTROY_L);
-    // printf("\n######  list destroyed  ######\n");
+
     printf("\n---------  New list  --------\n");
     char valor[MAX_LENGTH_CHAR_BRIDGE];
     for (int i = 0; i < numOfLines; i++){
