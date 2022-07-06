@@ -1,0 +1,7 @@
+#!/bin/sh
+echo "Compiling client in debug mode.."
+
+gcc -g ./clientBridge.c ./utilsClientBridge.c ./moduleImplement/bridgeLink.c ./moduleImplement/bridgeIO.c
+echo "The process has finished"
+exit
+

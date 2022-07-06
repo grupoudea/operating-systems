@@ -14,7 +14,7 @@ ln -s $SOURCE/scripts/bridge_syslog_clean $DESTITATION/bridge_syslog_clean
 
 ln -s $SOURCE/scripts/bridge_reset $DESTITATION/bridge_reset
 
-ln -s $SOURCE/clientBridge $DESTITATION/clientBridge
+ln -s $SOURCE/clientBridge $DESTITATION/clientBridgeX
 
 ln -s $SOURCE/scripts/compile_client $DESTITATION/compile_client
 

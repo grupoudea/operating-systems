@@ -10,4 +10,4 @@ void concatTwoLists(char** firstList, int numFirstList, char** secondList, int n
 
 void cleanList(char** arrayLines, int numOfLines);
 
-void priorityQueue(char** arrayLines, int numOfLines, char* priority);
+void priorityQueue(char** arrayLines);

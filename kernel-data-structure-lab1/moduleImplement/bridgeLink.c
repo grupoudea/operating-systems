@@ -183,6 +183,38 @@ void destroyList(char** arrayLines, int numOfLines){
     }
 }
 
+void priorityQueue(char** arrayLines){
+    int opcion, esc;
+    char message[100], priority[256];
+    long priorityInt = 0;
+    printf("##### Inserting strings in priorities queues #####\n");
+    do {
+        do{
+            printf("Insert message:\n\n");
+            fflush( stdin );
+            scanf("%s",&message);
+        }while((strlen(message)<1));
+
+        do{
+            printf("Insert priority (Integer only):\n1. HIGH\n2. MIDDLE\n3. LOW\n");
+            fflush( stdin );
+            scanf("%s",&priority);
+            priorityInt = strtol(priority, NULL, 10);
+        }while(!isValidInteger(priority)||(priorityInt<1 || priorityInt>3));
+        printf("We are going to store a message\n\n");
+        storeMessageInPriorityQueue(message, priorityInt);
+
+        do{
+            printf("Insert more message?\n1. Yes\n2. No\n\n");
+            scanf("%d",&esc);
+        }while(esc < 1 || esc >2);
+
+    }while(esc!=2);
+
+    printf("We're going to show you the message in orden of priority:\n\n");
+    readMessageWithPriority();
+}
+
 char* getPriorityText(int priority){
 
     if(priority==1){
@@ -200,38 +232,39 @@ int isValidInteger(char num[]){
     for (int i = 0; i < strlen(num); i++)
     {
         if(!isdigit(num[i]) ) {
-            printf("Ingrese un numero valido");
-            return 0; //no es numero valido
+            printf("Insert a valid number\n\n");
+            return 0;
         }
     }
     return 1;
 }
 
-void priorityQueue(char** arrayLines, int numOfLines, char* priorityP){
-    int opcion = 0;
-    char message[100];
-    char priority[256];
-    long priorityInt = 0;
-    printf("Insert a message with priotity or ESC exit\n1. HIGH\n2. MIDDLE\n3. LOW\n");
+void storeMessageInPriorityQueue(char* message, int levelPriority){
+    int fd = callModule();
+    switch (levelPriority){
+        case 1:
+            write_message(fd, BRIDGE_W_HIGH_PRIOR_Q, message);
+            break;
+        case 2:
+            write_message(fd, BRIDGE_W_MIDDLE_PRIOR_Q, message);
+            break;
+        case 3:
+            write_message(fd, BRIDGE_W_LOW_PRIOR_Q, message);
+            break;
+        default:
+            printf("We could store this in the high PQ, but we won't\n");
+            break;
+    }
+}
 
-    do{
-        printf("Insert message:\n");
-        scanf("%s",&message);
-    }while((strlen(message)<1));
+void readMessageWithPriority(){
+    int fd = callModule();
+    printf("#### HIGH PRIORITY\n");
+    read_all_messages_specify(fd, BRIDGE_STATE_HP_Q,BRIDGE_R_HIGH_PRIOR_Q);
 
-    do{
-        printf("Insert priority (Integer only):\n");
-        scanf("%s",&priority);
+    printf("\n#### MIDDLE PRIORITY\n");
+    read_all_messages_specify(fd, BRIDGE_STATE_MP_Q,BRIDGE_R_MIDDLE_PRIOR_Q);
 
-        printf(" priority: %s\n", priority);
-        priorityInt = strtol(priority, NULL, 10);
-        printf(" priorityINt: %d\n", priorityInt);
-
-
-        printf("is digit: %d | have prio %d \n", !isValidInteger(priority), (priorityInt<1 || priorityInt>3));
-    }while(!isValidInteger(priority)||(priorityInt<1 || priorityInt>3));
-
-
-    printf("We will store a message %s with priority %s\n",message, getPriorityText(priorityInt));
-
+    printf("\n#### LOW PRIORITY\n");
+    read_all_messages_specify(fd, BRIDGE_STATE_LP_Q,BRIDGE_R_LOW_PRIOR_Q);
 }

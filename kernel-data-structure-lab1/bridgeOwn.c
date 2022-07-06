@@ -141,6 +141,18 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	case BRIDGE_STATE_Q:
         printk(KERN_INFO "message %s\n", "bla6");
 	    break;
+	case BRIDGE_STATE_HP_Q:
+		return_value=listLength(&highPriorityQueue);
+	    printk(KERN_INFO "Queue state succesfully sended !!! entero: %d\n", return_value);
+	    break;
+	case BRIDGE_STATE_MP_Q:
+		return_value=listLength(&middlePriorityQueue);
+	    printk(KERN_INFO "Queue state succesfully sended !!!\n");
+	    break;
+	case BRIDGE_STATE_LP_Q:
+		return_value=listLength(&lowPriorityQueue);
+	    printk(KERN_INFO "Queue state succesfully sended !!!\n");
+	    break;
 	case BRIDGE_DESTROY_Q:
         printk(KERN_INFO "message %s\n", "bla7");
 	    break;
