@@ -35,9 +35,7 @@ static void add_element_to_stack(char *node_element_msg, struct list_head* head)
 	strcpy(tmp_element->message, node_element_msg);
 	INIT_LIST_HEAD(&tmp_element->list);
 	list_add(&(tmp_element->list), head);
-	// test = list_entry(head, struct string_node, list);
-	// char* valor = test->message;
-	// printk(KERN_INFO "se inserto %s antes de : %s",&tmp_element->message,valor);
+
 }
 
 static void read_all_list(struct list_head* head, char* nameList){
@@ -56,7 +54,6 @@ static void read_all_list_reverse(struct list_head* head, char* nameList){
 	struct string_node *tmp_element;
 	list_for_each_entry_reverse(tmp_element, head, list){
 		printk(KERN_INFO "%s : VALOR  = %s", nameList,  tmp_element->message);
-		//printk(KERN_INFO "actual : {%p,%s}, anterior: %p , siguiente: %p",watch,tmp_element->message,watch->prev,watch->next);
 	}
 }
 
@@ -69,7 +66,7 @@ void mylist_exit(void){
        	list_del(&(tmp_element->list));
 		kfree(tmp_element);
    	}
-    //kfree(&stack);
+ 
 }
 
 void cleanAllListElements(struct list_head* head){
@@ -94,35 +91,6 @@ int listLength(struct list_head* head){
 }
 
 void reverseList(void){
-	// struct list_head *watch, *next ,*prev,*temp;
-	// watch = &stack;
-
-	// printk(KERN_INFO "INIT element : %p , next : %p prev : %p, head :%p",watch,watch->next,watch->prev,&stack);
-	// while(watch->next!=&stack){
-	// 	printk(KERN_INFO "prev : %p ,element : %p , next : %p",watch->prev,watch,watch->next);
-	// 	next=watch->next;
-	// 	watch->next=prev;
-	// 	prev=watch;
-	// 	watch=next;
-	// 	printk(KERN_INFO "prev : %p ,element : %p , next : %p",watch->prev,watch,watch->next);
-	// }
-	// temp=&stack;
-	// printk(KERN_INFO "LAST next : %p prev : %p, head :%p",temp->next,temp->prev,&stack);
-	// list_replace_init(&stack,prev);
-	
-	// struct list_head *watch;
-	// watch = &stack;
-	// int num_nodes = listLength(&stack);
-	// int count=1;
-	
-	// printk(KERN_INFO "num of nodes %d",num_nodes);
-	// while(count<5)
-	// {
-	// 	printk(KERN_INFO "node  %d",count);
-	// 	list_bulk_move_tail(&stack,watch->next,watch->next);
-	// 	count=count+1;
-	// }
-
 	printk(KERN_INFO "Initial read ------------------");
 	read_all_list(&stack,"stack");
 	struct list_head *watch,*temp,*aux;
@@ -151,48 +119,6 @@ void reverseList(void){
 		count=count+1;
 		read_all_list(&stack,"stack");
 	}
-
-	// printk(KERN_INFO "Initial read ------------------");
-	// read_all_list(&stack,"stack");
-	// printk(KERN_INFO " ------------------");
-	// struct list_head *watch,*temp,*aux;
-	// struct string_node *node ;
-	// watch = &stack;
-	// temp=watch->prev;
-	// aux=temp->prev;
-	// node= list_entry(temp, struct string_node, list);
-	// printk(KERN_INFO "nodo anterior : %s",node->message);
-	// node= list_entry(watch->next, struct string_node, list);
-	// printk(KERN_INFO "nodo siguiente : %s",node->message);
-	// node= list_entry(aux, struct string_node, list);
-	// printk(KERN_INFO "nodo aux : %s",node->message);
-	// list_swap(watch->next,temp);
-
-	// printk(KERN_INFO " ------------------");
-	// read_all_list(&stack,"stack");
-
-	// watch=watch->next;
-	
-	// node= list_entry(temp, struct string_node, list);
-	// printk(KERN_INFO "nodo anterior : %s",node->message);
-	// node= list_entry(watch->next, struct string_node, list);
-	// printk(KERN_INFO "nodo siguiente : %s",node->message);
-	// node= list_entry(aux, struct string_node, list);
-	// printk(KERN_INFO "nodo aux : %s",node->message);
-	// list_swap(watch->next,temp);
-	// printk(KERN_INFO " ------------------");
-	// read_all_list(&stack,"stack");
-
-	// watch=watch->next;
-	// temp=aux;
-	// aux=aux->prev;
-	// node= list_entry(temp, struct string_node, list);
-	// printk(KERN_INFO "nodo anterior : %s",node->message);
-	// node= list_entry(watch->next, struct string_node, list);
-	// printk(KERN_INFO "nodo siguiente : %s",node->message);
-	// list_swap(watch->next,temp);
-	// 	printk(KERN_INFO " ------------------");
-	// read_all_list(&stack,"stack");
 }
 
 
@@ -254,7 +180,6 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    kfree(tmp_element);
 	    break;
 	case BRIDGE_STATE_S:
-		//return_value=list_empty(&stack);
 		return_value=listLength(&stack);
 	    printk(KERN_INFO "Stack state succesfully sended !!!\n");
 	    break;
