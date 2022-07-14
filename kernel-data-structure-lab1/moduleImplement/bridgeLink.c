@@ -27,16 +27,12 @@ void validarSimetria(char **file,int numOfLines){
     printf("numero de lineas : %d \n",numOfLines);
     char line[MAX_LENGTH_CHAR_BRIDGE];
     int fd = callModule();
-    // int value = send_empty_command(fd,BRIDGE_CREATE_S);
-    // printf("valores en la pila : %d",value);
-    // int value = send_empty_command(fd,BRIDGE_DESTROY_S);
-    //  printf("valores en la pila : %d",value);
+
     for (int i = 0; i < numOfLines; i++){
         char *line= file[i];
         for (int j = 0; j < strlen(line); j++){
             if(line[j]=='{' | line[j]=='('){
                 char tmp[2] = {line[j],'\0'} ;
-                //printf("%s",tmp);
                 write_message(fd, BRIDGE_W_S, tmp);
             }
             else if(line[j]=='}' | line[j]==')'){
@@ -93,6 +89,42 @@ int randomNumber(int maxNumber, int seed){
     return numberGenerate;
 }
 
+void invertirLista(char **arrayLines, int numOfLines){
+    int fd = callModule();
+    printf("\n---------  Original list  --------\n");
+    for (int i = 0; i < numOfLines; i++){
+        printf("(%d)%s \n",i,arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    printf("\n------------------------\n");
+   
+    send_empty_command(fd, BRIDGE_INVERT_L);
+    printf("\n*****  list inverted , see details in Kernel  ********\n");
+
+    printf("\n---------  New list  --------\n");
+    char valor[MAX_LENGTH_CHAR_BRIDGE];
+    for (int i = 0; i < numOfLines; i++){
+        read_message(fd, BRIDGE_R_L, valor);
+        printf("(%d) %s \n",i, valor);
+    }
+    printf("\n------------------------\n");
+}
+
+void greatherValue(char **arrayLines, int numOfLines){
+    int fd = callModule();
+    
+    printf("\n---------  Original list  --------\n");
+    for (int i = 0; i < numOfLines; i++){
+        printf("(%d)%s  \n", i,arrayLines[i]);
+        write_message(fd, BRIDGE_W_L, arrayLines[i]);
+    }
+    printf("\n------------------------\n");
+    char  value [MAX_LENGTH_CHAR_BRIDGE];
+    printf("\n---------  Greather value --------\n");
+    write_message(fd, BRIDGE_GREATER_VAL_L, value);  
+    printf("Greather value : %s \n",value);
+    send_empty_command(fd,BRIDGE_DESTROY_L);     
+}
 
 void randomLines(char** arrayLines, const int numOfLines, char* fileName){
     int fd = callModule();

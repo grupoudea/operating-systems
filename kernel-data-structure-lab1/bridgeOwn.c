@@ -36,13 +36,16 @@ LIST_HEAD(lowPriorityQueue);
 
 static void add_element_to_stack(char *node_element_msg, struct list_head* head){
 	struct string_node *tmp_element;
+	struct string_node *test;
 	tmp_element = kmalloc(sizeof(struct string_node), GFP_KERNEL);
 	strcpy(tmp_element->message, node_element_msg);
 	INIT_LIST_HEAD(&tmp_element->list);
 	list_add(&(tmp_element->list), head);
+
 }
 
 static void read_all_list(struct list_head* head, char* nameList){
+	printk(KERN_INFO "Getting list LIFO");
 	struct string_node *tmp_element;
 	struct list_head *watch, *next;
 	list_for_each_safe(watch, next, head){
@@ -52,6 +55,15 @@ static void read_all_list(struct list_head* head, char* nameList){
 	}
 }
 
+static void read_all_list_reverse(struct list_head* head, char* nameList){
+	printk(KERN_INFO "Getting list FIFO");
+	struct string_node *tmp_element;
+	list_for_each_entry_reverse(tmp_element, head, list){
+		printk(KERN_INFO "%s : VALOR  = %s", nameList,  tmp_element->message);
+	}
+}
+
+
 void mylist_exit(void){
     struct string_node *tmp_element;
 	struct list_head *watch, *next;
@@ -60,7 +72,7 @@ void mylist_exit(void){
        	list_del(&(tmp_element->list));
 		kfree(tmp_element);
    	}
-    //kfree(&stack);
+ 
 }
 
 void cleanAllListElements(struct list_head* head){
@@ -83,6 +95,39 @@ int listLength(struct list_head* head){
    	}
 	return cantidadRegistros;
 }
+
+void reverseList(void){
+	printk(KERN_INFO "Initial read ------------------");
+	read_all_list(&stack,"stack");
+	struct list_head *watch,*temp,*aux;
+	struct string_node *node ;
+	watch = &stack;
+	int num_nodes = listLength(&stack);
+	int itrations = num_nodes/2;
+	int count=0;
+	temp=watch->prev;
+	aux=temp->prev;
+	while(count<itrations)
+	{
+		
+		printk(KERN_INFO " ------------------");
+		node= list_entry(temp, struct string_node, list);
+		printk(KERN_INFO "nodo anterior : %s",node->message);
+		node= list_entry(watch->next, struct string_node, list);
+		printk(KERN_INFO "nodo siguiente : %s",node->message);
+		node= list_entry(aux, struct string_node, list);
+		printk(KERN_INFO "nodo aux : %s",node->message);
+		printk(KERN_INFO " ------------------");
+		list_swap(watch->next,temp);
+		watch=watch->next;
+		temp=aux;
+		aux=aux->prev;		
+		count=count+1;
+		read_all_list(&stack,"stack");
+	}
+}
+
+
 
 struct bridge_dev *bridge_devices;	/* allocated in bridge_init_module */
 
@@ -173,7 +218,6 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    kfree(tmp_element);
 	    break;
 	case BRIDGE_STATE_S:
-		//return_value=list_empty(&stack);
 		return_value=listLength(&stack);
 	    printk(KERN_INFO "Stack state succesfully sended !!!\n");
 	    break;
@@ -200,7 +244,10 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 	    }
 	    break;
 	case BRIDGE_INVERT_L:
-        printk(KERN_INFO "message %s\n", "bla16");
+		reverseList();
+		printk(KERN_INFO "list inverted\n");
+        read_all_list(&stack, "stack");
+		printk(KERN_INFO "--------------------------\n");
 	    break;
 	case BRIDGE_ROTATE_L:
 		printk(KERN_INFO "ROTAR LA LISTA \n");
@@ -250,8 +297,22 @@ static long bridge_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 		raw_copy_to_user((char *)arg, cantidadRegistros, 100);
 	    break;
 	case BRIDGE_GREATER_VAL_L:
-	    //strcpy((char *)arg, "MensajePrueba");
-        printk(KERN_INFO "message %s\n", "bla19");
+		char maxValue[100];
+		char * p =maxValue;
+		strncpy(maxValue,"",sizeof(maxValue));
+	    list_for_each_safe(watch, next, &stack){
+			tmp_element = list_entry(watch, struct string_node, list);
+			char* valor = tmp_element->message;
+			
+			if(strcmp(valor,p)>0)
+			{
+				printk(KERN_INFO "new maxvalue : %s , old maxvalue : %s",valor,p);
+				p =valor;
+				printk(KERN_INFO "new maxvalue : %s" ,p);
+			}
+		}
+		raw_copy_to_user((char *)arg, p, 100);	
+		printk(KERN_INFO "--------------------------\n");
 	    break;
 	case BRIDGE_END_L:
         printk(KERN_INFO "message %s\n", "bla21");
@@ -383,6 +444,7 @@ int bridge_init_module(void)
 	return 0; /* succeed */
 
   fail:
+  	printk(KERN_WARNING "loading module failed, trying to clean it up");
 	bridge_cleanup_module();
 	return result;
 }

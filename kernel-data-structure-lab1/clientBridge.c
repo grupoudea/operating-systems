@@ -81,7 +81,7 @@ void chooseOption(char* option){
     }else if(strcmp(DESTRUIR_LISTA, option) == 0){
         destroyList(linesArray, numOfLines);
     }else if(strcmp(INVERTIR, option) == 0){
-
+        invertirLista(linesArray,numOfLines);
     }else if(strcmp(CONCATENAR, option) == 0){
         char* secondPathfile = getPathFileSecond();
         int numOfLinesToConcat = 0;
@@ -93,7 +93,7 @@ void chooseOption(char* option){
     }else if(strcmp(LIMPIAR_LISTA, option) == 0){
         cleanList(linesArray, numOfLines);
     }else if(strcmp(MAYOR, option) == 0){
-
+        greatherValue(linesArray, numOfLines);
     }else{
         usageMenu();
     }

@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-{
+
 int main(int argc, char *argv[]){
     argsc = argc;
     argsv = argv;
