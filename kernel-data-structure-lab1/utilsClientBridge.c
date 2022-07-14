@@ -64,7 +64,7 @@ int numberOfLines(FILE* file, int* size){
             i++;
         }
         if(character == EOF){
-            // i++;
+            i++;
             *size = i;
             break;
         }

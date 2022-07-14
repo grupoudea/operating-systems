@@ -9,3 +9,5 @@ void randomLines(char** arrayLines, int numOfLines, char* fileName);
 void concatTwoLists(char** firstList, int numFirstList, char** secondList, int numSecondList);
 
 void cleanList(char** arrayLines, int numOfLines);
+
+void priorityQueue(char** arrayLines);
