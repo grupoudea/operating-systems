@@ -1,7 +1,6 @@
 #!/bin/sh
 echo "Compiling client.."
 
-echo "Executing: $BASE_COMPILE"
 gcc -o clientBridge ./clientBridge.c ./utilsClientBridge.c ./moduleImplement/bridgeLink.c ./moduleImplement/bridgeIO.c
 
 echo "The process has finished"
