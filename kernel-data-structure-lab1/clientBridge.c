@@ -12,12 +12,12 @@ char** argsv;
 int argsc;
 
 void usageMenu(){
-    printf("uso: clientBridge [--help] \n");
+    printf("uso: %s [--help] \n",argsv[0]);
     printf("\n");
     printf("  %s <path-file> \t\t\t\t Lee las líneas de un archivo y las muestra en orden inverso. \n", ORDEN_INVERSO);
     printf("  %s <path-file> \t\t\t\t\t Baraja aleatoriamente las líneas de un archivo. \n", RANDOM);
     printf("  %s <path-file> \t\t\t Lee un archivo .c y valida la simetría de los paréntesis y llaves. \n", VALIDAR_SIMETRIA);
-    printf("  %s <path-file> <ALTA|MEDIA|BAJA> \t Crea una cola con prioridad \n", COLA_PRIORIDAD);
+    printf("  %s \t\t\t\t\t Crea una cola con prioridad \n", COLA_PRIORIDAD);
     printf("  %s <path-file> \t\t\t\t Destruye una lista totalmente \n", DESTRUIR_LISTA);
     printf("  %s <path-file> \t\t\t\t Invierte los nodos de una lista \n", INVERTIR);
     printf("  %s <path-file-1> <path-file-2> \t\t Concatena dos listas \n", CONCATENAR);
@@ -57,10 +57,14 @@ char* getPathFileSecond(){
 }
 
 void chooseOption(char* option){
-
-    char* pathfile = getPathFile();
+    char* pathfile;
     int numOfLines = 0;
-    char** linesArray = readFile(pathfile, &numOfLines);
+    char** linesArray;
+
+    if(strcmp(COLA_PRIORIDAD, option)!=0){
+        pathfile = getPathFile();
+        linesArray = readFile(pathfile, &numOfLines);
+    }
 
     if(strcmp(ORDEN_INVERSO, option) == 0){
         ordenInverso(linesArray, numOfLines);
@@ -69,14 +73,15 @@ void chooseOption(char* option){
         randomLines(linesArray, numOfLines, pathfile);
 
     }else if(strcmp(VALIDAR_SIMETRIA, option) == 0){
-        validarSimetria(linesArray, numOfLines);
+       validarSimetria(linesArray, numOfLines);
 
     }else if(strcmp(COLA_PRIORIDAD, option) == 0){
+        priorityQueue(linesArray);
 
     }else if(strcmp(DESTRUIR_LISTA, option) == 0){
         destroyList(linesArray, numOfLines);
     }else if(strcmp(INVERTIR, option) == 0){
-
+        invertirLista(linesArray,numOfLines);
     }else if(strcmp(CONCATENAR, option) == 0){
         char* secondPathfile = getPathFileSecond();
         int numOfLinesToConcat = 0;
@@ -88,7 +93,7 @@ void chooseOption(char* option){
     }else if(strcmp(LIMPIAR_LISTA, option) == 0){
         cleanList(linesArray, numOfLines);
     }else if(strcmp(MAYOR, option) == 0){
-
+        greatherValue(linesArray, numOfLines);
     }else{
         usageMenu();
     }

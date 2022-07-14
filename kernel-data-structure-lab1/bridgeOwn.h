@@ -17,6 +17,9 @@
 #define BRIDGE_R_MIDDLE_PRIOR_Q _IOR('p', 6, char *)
 #define BRIDGE_R_LOW_PRIOR_Q _IOR('p', 7, char *)
 #define BRIDGE_STATE_Q _IO('p', 8)
+#define BRIDGE_STATE_HP_Q _IO('p', 27)
+#define BRIDGE_STATE_MP_Q _IO('p', 28)
+#define BRIDGE_STATE_LP_Q _IO('p', 29)
 #define BRIDGE_DESTROY_Q _IO('p', 9)
 
 #define BRIDGE_CREATE_S _IO('p', 10)                    //Create a stack

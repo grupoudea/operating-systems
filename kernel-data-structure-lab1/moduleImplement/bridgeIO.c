@@ -44,8 +44,6 @@ int send_empty_command(int fd, unsigned long command){
     int result = ioctl(fd, command);
     if( result == -1){
        perror("Send command error at ioctl");
-    }else{
-        printf("Command OK to the kernel\n");
     }
     return result;
 }
@@ -60,6 +58,14 @@ void read_all_messages(int fd, unsigned long command){
 	char message[100];
 	while( send_empty_command(fd, BRIDGE_STATE_S) > 0){
 	    read_message(fd, command, message);
+	    printf("Message: %s\n", message);
+	}
+}
+
+void read_all_messages_specify(int fd, unsigned long stateCommand, unsigned long queue){
+	char message[100];
+	while( send_empty_command(fd, stateCommand) > 0){
+	    read_message(fd, queue, message);
 	    printf("Message: %s\n", message);
 	}
 }
