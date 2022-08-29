@@ -26,6 +26,17 @@ struct reg_descriptor {
     char* name;
 };
 
+struct option_menu{
+    int code;
+    char* name;
+};
+
+const struct option_menu options_menu[]={
+    {0,"break"},
+    {1,"continue"},
+    {2,"previous"},
+    {3,"next"}
+};
 const int n_registers = 27;
 
 const struct reg_descriptor g_register_descriptors[] = {
@@ -97,6 +108,31 @@ int main(int argc, char* argv[]) {
 }
 
 void handle_command(char* line) {
+
+    int code = get_option_menu(line);
+    if(code==-1){
+        //exit 
+    }
+
+    switch (code)
+    {
+        case 0:
+            /* break code */
+            break;
+        case 1:
+            /* continue code */
+            break;
+        case 2:
+            /* previous code  */
+            break;
+        case 3:
+            /* next */
+            break;
+        
+        default:
+            break;
+    }
+
     //At this point you must to implement all the logic to manage the inputs of the program:
     //continue -> To continue the execution of the program
     //next -> To go step by step
@@ -115,7 +151,7 @@ void handle_command(char* line) {
     ptrace(PTRACE_SETREGS, child->pid, NULL, &regs);
 
     //If you want to enable a breakpoint (in a provided adress, for example 0x555555554655), you must to use the following CALL
-    breakpt->addr =  ((uint64_t)strtol("0x555555554655", NULL, 0));
+    breakpt->addr =  ((uint64_t)strtol("0x5555555551a9", NULL, 0));
     uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, breakpt->addr, NULL);
     breakpt->prev_opcode = (uint8_t)(data & 0xff);
     uint64_t int3 = 0xcc;
@@ -133,7 +169,7 @@ void handle_command(char* line) {
     ptrace(PTRACE_SINGLESTEP, child->pid, NULL, NULL);
 
     //To read the value in a memory adress
-    uint64_t value_in_memory = (uint64_t)ptrace(PTRACE_PEEKDATA, child->pid, (uint64_t)strtol("0x555555554655", NULL, 0), NULL);
+    uint64_t value_in_memory = (uint64_t)ptrace(PTRACE_PEEKDATA, child->pid, (uint64_t)strtol("0x5555555551a9", NULL, 0), NULL);
 
     //To write a value in an adress
     ptrace(PTRACE_POKEDATA, child->pid, (uint64_t)strtol("0x555555554655", NULL, 0), (uint64_t)strtol("0x555555554655", NULL, 0));
@@ -143,4 +179,15 @@ void handle_command(char* line) {
     int status;
     int options = 0;
     waitpid(child->pid, &status, options);
+}
+
+
+const  int get_option_menu(char* option_name){
+    for (int i = 0; i < 4; i++)
+    {
+        if(strcmp(options_menu[i].name,option_name)==0){
+            return(options_menu[i].code);
+        }
+    }
+    return -1;
 }
