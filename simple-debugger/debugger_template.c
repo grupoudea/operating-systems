@@ -125,7 +125,7 @@ void handle_command(char* line){
     {
         case 0:
             if(count_break_point<5){
-                create_break_point(values[1]);      
+                create_break_point(values[1]);
             }
             else{
                 printf("You have a limit of 5 break points");
@@ -165,7 +165,6 @@ void clean_break_points(){
             free(break_point_list[i]);
         }
     }
-    
 }
 
 void continue_process(){
