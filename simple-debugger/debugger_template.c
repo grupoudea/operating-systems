@@ -69,6 +69,8 @@ const struct reg_descriptor g_register_descriptors[] = {
     { 26, "gs" },
 };
 
+struct breakpoint  *break_point_list[5];
+int count_break_point=0;
 void handle_command(char*);
 
 struct debugee *child;
@@ -103,24 +105,34 @@ int main(int argc, char* argv[]) {
     }
 
     free(child);
-    free(breakpt);
+    clean_break_points();
+    // free(breakpt);
+    
     return 0;
 }
 
-void handle_command(char* line) {
-
-    int code = get_option_menu(line);
-    if(code==-1){
-        //exit 
+void handle_command(char* line){
+    char* values[2];
+    char* str_copy = strdup(line);
+    *values = strtok(str_copy," ");
+    int code = get_option_menu(values[0]);
+    if(code==-1){//command does not exist
+        printf("Command does not exist");
+       return -1;
     }
 
     switch (code)
     {
         case 0:
-            /* break code */
+            if(count_break_point<5){
+                create_break_point(values[1]);      
+            }
+            else{
+                printf("You have a limit of 5 break points");
+            }
             break;
         case 1:
-            /* continue code */
+            continue_process();
             break;
         case 2:
             /* previous code  */
@@ -128,10 +140,44 @@ void handle_command(char* line) {
         case 3:
             /* next */
             break;
-        
-        default:
-            break;
     }
+}
+
+void create_break_point(char* addr){
+    struct breakpoint *tempbp ;
+    tempbp = malloc(sizeof(tempbp));
+    tempbp->addr=(uint64_t)strtol(addr,NULL,0);
+    uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, tempbp->addr, NULL);
+    tempbp->prev_opcode = (uint8_t)(data & 0xff);
+    uint64_t int3 = 0xcc;
+    uint64_t data_with_int3 = ((data & ~0xff) | int3);
+    ptrace(PTRACE_POKEDATA, child->pid, tempbp->addr, data_with_int3);
+    tempbp->active = 1;
+    break_point_list[count_break_point]=tempbp;
+    count_break_point= count_break_point+1;
+
+
+}
+void clean_break_points(){
+    for (int i = 0; i < 5; i++)
+    {
+        if(break_point_list[i]!=NULL){
+            free(break_point_list[i]);
+        }
+    }
+    
+}
+
+void continue_process(){
+    int signal;
+    ptrace(PTRACE_CONT,child->pid,NULL ,NULL);
+    waitpid(child->pid,signal,0);
+
+}
+
+
+//main handle command
+void handle_commandOld(char* line) {
 
     //At this point you must to implement all the logic to manage the inputs of the program:
     //continue -> To continue the execution of the program
