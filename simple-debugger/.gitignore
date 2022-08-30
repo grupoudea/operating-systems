@@ -125,5 +125,6 @@ dkms.conf
 *.symvers
 *.order
 
-clientBridge
+basicHello
+debugger_template
 
