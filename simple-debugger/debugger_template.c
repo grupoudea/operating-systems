@@ -114,7 +114,15 @@ int main(int argc, char* argv[]) {
 void handle_command(char* line){
     char* values[2];
     char* str_copy = strdup(line);
-    *values = strtok(str_copy," ");
+    // *values = strtok(str_copy," ");
+    char * token = strtok(str_copy, " ");
+    int counter_inputs =0;
+    while( token != NULL ) {
+        values[counter_inputs] = strdup(token);
+        token = strtok(NULL, " ");
+        counter_inputs++;
+        if(counter_inputs == 3) printf("You can provide up to 2 words in the input");
+    }
     int code = get_option_menu(values[0]);
     if(code==-1){//command does not exist
         printf("Command does not exist");
