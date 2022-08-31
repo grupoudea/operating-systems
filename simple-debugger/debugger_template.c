@@ -72,6 +72,7 @@ const struct reg_descriptor g_register_descriptors[] = {
 struct breakpoint  *break_point_list[5];
 int count_break_point=0;
 void handle_command(char*);
+void step_over_breakpoint();
 
 struct debugee *child;
 struct breakpoint *breakpt;
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]) {
 
     child->name = argv[1];
     child->pid = fork();
-
+    printf("Child's PID: %d\n",child->pid);
     if (child->pid == 0) {
         personality(ADDR_NO_RANDOMIZE);
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
@@ -107,7 +108,7 @@ int main(int argc, char* argv[]) {
     free(child);
     clean_break_points();
     // free(breakpt);
-    
+
     return 0;
 }
 
@@ -154,7 +155,7 @@ void handle_command(char* line){
 void create_break_point(char* addr){
     struct breakpoint *tempbp ;
     tempbp = malloc(sizeof(tempbp));
-    tempbp->addr=(uint64_t)strtol(addr,NULL,0);
+    tempbp->addr=(uint64_t)strtol(addr,NULL,0); //93824992235934
     uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, tempbp->addr, NULL);
     tempbp->prev_opcode = (uint8_t)(data & 0xff);
     uint64_t int3 = 0xcc;
@@ -163,9 +164,25 @@ void create_break_point(char* addr){
     tempbp->active = 1;
     break_point_list[count_break_point]=tempbp;
     count_break_point= count_break_point+1;
-
-
 }
+
+void enable_break(struct breakpoint* breakpoint){
+    uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, breakpoint->addr, NULL);
+    breakpoint->prev_opcode = (uint8_t)(data & 0xff);
+    uint64_t int3 = 0xcc;
+    uint64_t data_with_int3 = ((data & ~0xff) | int3);
+    ptrace(PTRACE_POKEDATA, child->pid, breakpoint->addr, data_with_int3);
+    breakpoint->active = 1;
+}
+
+void disable_break(struct breakpoint* breakpoint){
+    //To disable a breakpoint
+    uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, breakpoint->addr, NULL);
+    uint64_t restored_data = ((data & ~0xff) | breakpoint->prev_opcode);
+    ptrace(PTRACE_POKEDATA, child->pid, breakpoint->addr, restored_data);
+    breakpoint->active = 0;
+}
+
 void clean_break_points(){
     for (int i = 0; i < 5; i++)
     {
@@ -175,7 +192,46 @@ void clean_break_points(){
     }
 }
 
+uint64_t get_pc(){
+    struct user_regs_struct regs;
+    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+    return (uint64_t)regs.rip;
+}
+
+void set_pc(uint64_t pc){
+    struct user_regs_struct regs;
+    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+    regs.rip = pc;
+    ptrace(PTRACE_SETREGS, child->pid, NULL, &regs);
+
+}
+
+void wait_for_signal(int* wait_status){
+    int op = 0;
+    waitpid(child->pid, wait_status, op);
+}
+
+void step_over_breakpoint(){
+    uint64_t possible_bp = get_pc()-1;
+    for(int i=0; i < 5; +i++){
+        if(break_point_list[i] != NULL){
+            if(possible_bp == break_point_list[i]->addr){
+                uint64_t previous = possible_bp;
+                set_pc(previous);
+                disable_break(break_point_list[i]);
+                ptrace(PTRACE_SINGLESTEP, child->pid, NULL, NULL);
+                int status;
+                wait_for_signal(&status);
+                enable_break(break_point_list[i]);
+            }
+        }
+
+       
+    }
+}
+
 void continue_process(){
+    step_over_breakpoint();
     int signal;
     ptrace(PTRACE_CONT,child->pid,NULL ,NULL);
     waitpid(child->pid,signal,0);
