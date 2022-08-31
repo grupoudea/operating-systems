@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 
 void handle_command(char* line){
     char* values[2];
-     char* str_copy = strdup(line);
+    char* str_copy = strdup(line);
     // *values = strtok(str_copy," ");
     char * token = strtok(str_copy, " ");
     int counter_inputs =0;
