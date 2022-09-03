@@ -37,7 +37,7 @@ struct option_menu{
 const struct option_menu options_menu[]={
     {0,"break"},
     {1,"continue"},
-    {2,"previous"},
+    {2,"register"},
     {3,"next"}
 };
 const int n_registers = 27;
@@ -117,16 +117,15 @@ int main(int argc, char* argv[]) {
 }
 
 void handle_command(char* line){
-    char* values[2];
+    char* values[6];
     char* str_copy = strdup(line);
-    // *values = strtok(str_copy," ");
     char * token = strtok(str_copy, " ");
     int counter_inputs =0;
     while( token != NULL ) {
         values[counter_inputs] = strdup(token);
         token = strtok(NULL, " ");
         counter_inputs++;
-        if(counter_inputs == 3) printf("You can provide up to 2 words in the input");
+        if(counter_inputs == 6) printf("You can provide up to 5 words in the input");
     }
     int code = get_option_menu(values[0]);
     if(code==-1){//command does not exist
@@ -148,7 +147,7 @@ void handle_command(char* line){
             continue_process();
             break;
         case 2:
-            /* previous code  */
+            register_intruction(values[1],values[2]);
             break;
         case 3:
             /* next */
@@ -244,6 +243,21 @@ void step_by_step(){
     }
 }
 
+void register_intruction(char* cmd,char* addr){
+    struct user_regs_struct regs ;
+    uint64_t *p;
+    uint64_t *reg_addr;
+    ptrace(PTRACE_GETREGS,child->pid,NULL,&regs);
+    p=(uint64_t*)&(regs.rip);
+    if(strcmp(cmd,"read")==0){
+        printf("register is in : %lx \n",*p);
+    }else if (strcmp(cmd,"write")==0){
+        *p=(uint64_t)strtol(addr,NULL,0);
+        ptrace(PTRACE_SETREGS,child->pid,NULL,&regs);
+    }
+}
+
+
 void create_break_point(char* addr){
     struct breakpoint *tempbp ;
     tempbp = malloc(sizeof(tempbp));
@@ -292,7 +306,6 @@ void rewindInstructionRegister(uint64_t newValeInstructionRegister){
                 ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
                 regs.rip = newValeInstructionRegister;
                 ptrace(PTRACE_SETREGS, child->pid, NULL, &regs);
-
                 disable_break(break_point_list[i]);
                 ptrace(PTRACE_SINGLESTEP, child->pid, NULL, NULL);
                 int status;
@@ -302,6 +315,7 @@ void rewindInstructionRegister(uint64_t newValeInstructionRegister){
         }
     }
 }
+
 
 void continue_process(){
     struct user_regs_struct regs;
