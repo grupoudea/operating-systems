@@ -34,7 +34,7 @@ struct option_menu{
 const struct option_menu options_menu[]={
     {0,"break"},
     {1,"continue"},
-    {2,"previous"},
+    {2,"register"},
     {3,"next"}
 };
 const int n_registers = 27;
@@ -72,6 +72,7 @@ const struct reg_descriptor g_register_descriptors[] = {
 struct breakpoint  *break_point_list[5];
 int count_break_point=0;
 void handle_command(char*);
+void step_over_breakpoint();
 
 struct debugee *child;
 struct breakpoint *breakpt;
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]) {
 
     child->name = argv[1];
     child->pid = fork();
-
+    printf("Child's PID: %d\n",child->pid);
     if (child->pid == 0) {
         personality(ADDR_NO_RANDOMIZE);
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
@@ -107,21 +108,20 @@ int main(int argc, char* argv[]) {
     free(child);
     clean_break_points();
     // free(breakpt);
-    
+
     return 0;
 }
 
 void handle_command(char* line){
-    char* values[2];
+    char* values[6];
     char* str_copy = strdup(line);
-    // *values = strtok(str_copy," ");
     char * token = strtok(str_copy, " ");
     int counter_inputs =0;
     while( token != NULL ) {
         values[counter_inputs] = strdup(token);
         token = strtok(NULL, " ");
         counter_inputs++;
-        if(counter_inputs == 3) printf("You can provide up to 2 words in the input");
+        if(counter_inputs == 6) printf("You can provide up to 5 words in the input");
     }
     int code = get_option_menu(values[0]);
     if(code==-1){//command does not exist
@@ -143,7 +143,7 @@ void handle_command(char* line){
             continue_process();
             break;
         case 2:
-            /* previous code  */
+            register_intruction(values[1],values[2]);
             break;
         case 3:
             /* next */
@@ -151,10 +151,25 @@ void handle_command(char* line){
     }
 }
 
+void register_intruction(char* cmd,char* addr){
+    struct user_regs_struct regs ;
+    uint64_t *p;
+    uint64_t *reg_addr;
+    ptrace(PTRACE_GETREGS,child->pid,NULL,&regs);
+    p=(uint64_t*)&(regs.rip);
+    if(strcmp(cmd,"read")==0){
+        printf("register is in : %lx \n",*p);
+    }else if (strcmp(cmd,"write")==0){
+        *p=(uint64_t)strtol(addr,NULL,0);
+        ptrace(PTRACE_SETREGS,child->pid,NULL,&regs);
+    }
+}
+
+
 void create_break_point(char* addr){
     struct breakpoint *tempbp ;
     tempbp = malloc(sizeof(tempbp));
-    tempbp->addr=(uint64_t)strtol(addr,NULL,0);
+    tempbp->addr=(uint64_t)strtol(addr,NULL,0); //93824992235945
     uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, tempbp->addr, NULL);
     tempbp->prev_opcode = (uint8_t)(data & 0xff);
     uint64_t int3 = 0xcc;
@@ -163,9 +178,25 @@ void create_break_point(char* addr){
     tempbp->active = 1;
     break_point_list[count_break_point]=tempbp;
     count_break_point= count_break_point+1;
-
-
 }
+
+void enable_break(struct breakpoint* breakpoint){
+    uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, breakpoint->addr, NULL);
+    breakpoint->prev_opcode = (uint8_t)(data & 0xff);
+    uint64_t int3 = 0xcc;
+    uint64_t data_with_int3 = ((data & ~0xff) | int3);
+    ptrace(PTRACE_POKEDATA, child->pid, breakpoint->addr, data_with_int3);
+    breakpoint->active = 1;
+}
+
+void disable_break(struct breakpoint* breakpoint){
+    //To disable a breakpoint
+    uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, breakpoint->addr, NULL);
+    uint64_t restored_data = ((data & ~0xff) | breakpoint->prev_opcode);
+    ptrace(PTRACE_POKEDATA, child->pid, breakpoint->addr, restored_data);
+    breakpoint->active = 0;
+}
+
 void clean_break_points(){
     for (int i = 0; i < 5; i++)
     {
@@ -175,7 +206,49 @@ void clean_break_points(){
     }
 }
 
+uint64_t get_pc(){
+    struct user_regs_struct regs;
+    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+    return (uint64_t)regs.rip;
+}
+
+void set_pc(uint64_t pc){
+    struct user_regs_struct regs;
+    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+    regs.rip = pc;
+    ptrace(PTRACE_SETREGS, child->pid, NULL, &regs);
+
+}
+
+void wait_f(int* wait_status){
+    int op = 0;
+    waitpid(child->pid, wait_status, op);
+}
+
+void step_over_breakpoint(){
+    uint64_t prev_register = get_pc()-1;
+    for(int i=0; i < 5; +i++){
+        if(break_point_list[i] != NULL){
+            if(prev_register == break_point_list[i]->addr){
+                // uint64_t previous = prev_register;
+                set_pc(prev_register);
+                disable_break(break_point_list[i]);
+                const int pRes  = ptrace(PTRACE_SINGLESTEP, child->pid, NULL, 0);
+                if (pRes < 0)
+                {
+                    printf("singlestep error");
+                }
+                int status;
+                wait_f(&status);
+                enable_break(break_point_list[i]);
+            }
+        }
+    }
+}
+
+
 void continue_process(){
+    step_over_breakpoint();
     int signal;
     ptrace(PTRACE_CONT,child->pid,NULL ,NULL);
     waitpid(child->pid,signal,0);
