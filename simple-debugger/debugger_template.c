@@ -5,8 +5,11 @@
 #include <sys/user.h>
 #include <string.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <sys/syscall.h>
+#include <errno.h>
 #include <sys/personality.h>
 #include "linenoise.h"
 
@@ -71,6 +74,7 @@ const struct reg_descriptor g_register_descriptors[] = {
 
 struct breakpoint  *break_point_list[5];
 int count_break_point=0;
+int count_step = 0;
 void handle_command(char*);
 void step_over_breakpoint();
 
@@ -133,7 +137,7 @@ void handle_command(char* line){
     {
         case 0:
             if(count_break_point<5){
-                create_break_point(values[1]);
+                nextcreate_break_point(values[1]);
             }
             else{
                 printf("You have a limit of 5 break points");
@@ -147,7 +151,95 @@ void handle_command(char* line){
             break;
         case 3:
             /* next */
+            count_step++;
+            if(count_step==1){
+                continue_process();
+
+            }else{
+                step2();
+            }
+            
             break;
+    }
+}
+
+int ptrace_instruction_pointer(uint64_t *rip)
+{
+    struct user_regs_struct regs;
+    if( ptrace(PTRACE_GETREGS, child->pid, NULL, (void*)&regs) ) {
+        fprintf(stderr, "Error fetching registers from child process: %s\n",
+            strerror(errno));
+        return -1;
+    }
+    if( rip )
+        *rip = regs.rip;
+    return 0;
+}
+
+int singlestep()
+{
+    int retval, status, signal = 0;
+    retval = ptrace(PTRACE_SINGLESTEP, child->pid, NULL, signal);
+
+    if( retval ) {
+        return retval;
+    }
+    waitpid(child->pid, &status, 0);
+    return status;
+}
+
+void step2(){
+    uint64_t rip;
+    struct user_regs_struct regs;
+
+    ptrace_instruction_pointer(&rip);
+
+    fprintf(stderr, "RIP: %p\n", (void*)rip);
+    singlestep();
+
+    
+
+}
+
+void step(){
+    struct user_regs_struct regs;
+    //nos sirve para obtener la instrucción proxima a ejecutar
+    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+    printf("instrucción que se ejecuta: %lld\n",regs.rip);
+    printf("val = 0x%" PRIx64 "\n", regs.rip);
+
+    int status;
+     //To execute a singe step
+    ptrace(PTRACE_SINGLESTEP, child->pid, NULL, NULL);
+    waitpid(child->pid,status,0);
+}
+
+void step_by_step(){
+    int status;
+
+    struct user_regs_struct regs;
+    int start = 0;
+    long ins;
+    while(1) {
+        waitpid(child->pid, &status, 0);
+        if(WIFEXITED(status)){
+            break;
+        }
+        ptrace(PTRACE_GETREGS,child->pid, NULL, &regs);
+        if(start == 1) {
+            ins = ptrace(PTRACE_PEEKTEXT,child, regs.rdi,NULL);
+            printf("EIP: %lx Instruction "
+                    "executed: %lx\n",
+                    regs.rdi, ins);
+        }
+        if(regs.orig_rax == SYS_write) {
+            start = 1;
+            ptrace(PTRACE_SINGLESTEP, child,
+                    NULL, NULL);
+        }
+        else
+            ptrace(PTRACE_SYSCALL, child,
+                    NULL, NULL);
     }
 }
 
@@ -169,7 +261,7 @@ void register_intruction(char* cmd,char* addr){
 void create_break_point(char* addr){
     struct breakpoint *tempbp ;
     tempbp = malloc(sizeof(tempbp));
-    tempbp->addr=(uint64_t)strtol(addr,NULL,0); //93824992235945
+    tempbp->addr=(uint64_t)strtol(addr,NULL,0);
     uint64_t data = ptrace(PTRACE_PEEKDATA, child->pid, tempbp->addr, NULL);
     tempbp->prev_opcode = (uint8_t)(data & 0xff);
     uint64_t int3 = 0xcc;
@@ -206,40 +298,18 @@ void clean_break_points(){
     }
 }
 
-uint64_t get_pc(){
-    struct user_regs_struct regs;
-    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
-    return (uint64_t)regs.rip;
-}
-
-void set_pc(uint64_t pc){
-    struct user_regs_struct regs;
-    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
-    regs.rip = pc;
-    ptrace(PTRACE_SETREGS, child->pid, NULL, &regs);
-
-}
-
-void wait_f(int* wait_status){
-    int op = 0;
-    waitpid(child->pid, wait_status, op);
-}
-
-void step_over_breakpoint(){
-    uint64_t prev_register = get_pc()-1;
+void rewindInstructionRegister(uint64_t newValeInstructionRegister){
     for(int i=0; i < 5; +i++){
         if(break_point_list[i] != NULL){
-            if(prev_register == break_point_list[i]->addr){
-                // uint64_t previous = prev_register;
-                set_pc(prev_register);
+            if(newValeInstructionRegister == break_point_list[i]->addr){
+                struct user_regs_struct regs;
+                ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+                regs.rip = newValeInstructionRegister;
+                ptrace(PTRACE_SETREGS, child->pid, NULL, &regs);
                 disable_break(break_point_list[i]);
-                const int pRes  = ptrace(PTRACE_SINGLESTEP, child->pid, NULL, 0);
-                if (pRes < 0)
-                {
-                    printf("singlestep error");
-                }
+                ptrace(PTRACE_SINGLESTEP, child->pid, NULL, NULL);
                 int status;
-                wait_f(&status);
+                waitpid(child->pid,&status,0);
                 enable_break(break_point_list[i]);
             }
         }
@@ -248,11 +318,20 @@ void step_over_breakpoint(){
 
 
 void continue_process(){
-    step_over_breakpoint();
-    int signal;
-    ptrace(PTRACE_CONT,child->pid,NULL ,NULL);
-    waitpid(child->pid,signal,0);
+    struct user_regs_struct regs;
+    //nos sirve para obtener la instrucción proxima a ejecutar
+    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+    //printf("instrucción que se ejecuta: %lld\n",regs.rip);
+    //printf("val = 0x%" PRIx64 "\n", regs.rip);
+    uint64_t currentValueInstructionRegister = (regs.rip);
+    uint64_t preInstructionRegister = currentValueInstructionRegister-1;
+    rewindInstructionRegister(preInstructionRegister);
 
+    int status;
+    ptrace(PTRACE_CONT,child->pid,NULL ,NULL);
+
+    waitpid(child->pid,status,0);
+    //printf("valor de signal: %d\n",status);
 }
 
 
