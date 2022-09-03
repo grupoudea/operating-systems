@@ -82,6 +82,7 @@ struct debugee *child;
 struct breakpoint *breakpt;
 
 int main(int argc, char* argv[]) {
+
     if (argc < 2) {
         printf("Program name not specified");
         return -1;
@@ -92,6 +93,7 @@ int main(int argc, char* argv[]) {
 
     child->name = argv[1];
     child->pid = fork();
+   
     printf("Child's PID: %d\n",child->pid);
     if (child->pid == 0) {
         personality(ADDR_NO_RANDOMIZE);
@@ -137,7 +139,7 @@ void handle_command(char* line){
     {
         case 0:
             if(count_break_point<5){
-                nextcreate_break_point(values[1]);
+                create_break_point(values[1]);
             }
             else{
                 printf("You have a limit of 5 break points");
@@ -151,14 +153,15 @@ void handle_command(char* line){
             break;
         case 3:
             /* next */
-            count_step++;
-            if(count_step==1){
-                continue_process();
+            // count_step++;
+            // if(count_step==1){
+            //     continue_process();
 
-            }else{
-                step2();
-            }
-            
+            // }else{
+            //     step2();
+            // }
+            step3();
+            // singleStepPru();
             break;
     }
 }
@@ -176,10 +179,41 @@ int ptrace_instruction_pointer(uint64_t *rip)
     return 0;
 }
 
+void singleStepPru(){
+    int status;
+    printf("child: %d\n", child->pid);
+    waitpid(child->pid, &status, __WALL);
+    ptrace(PTRACE_CONT, child->pid, NULL, NULL);
+    while(1) {
+        unsigned long rip;
+        waitpid(child->pid, &status, __WALL);
+        if (WIFEXITED(status)) return 0;
+        rip = ptrace(PTRACE_PEEKUSER, child->pid, 16*8, 0);    // RIP is the 16th register in the PEEKUSER layout
+        printf("RIP: %016lx opcode: %02x\n", rip, (unsigned char)ptrace(PTRACE_PEEKTEXT, child->pid, rip, NULL));
+        ptrace(PTRACE_SINGLESTEP, child->pid, NULL, NULL);
+    }
+}
+void step3(){
+    struct user_regs_struct regs;
+    //nos sirve para obtener la instrucción proxima a ejecutar
+    ptrace(PTRACE_GETREGS, child->pid, NULL, &regs);
+    //printf("instrucción que se ejecuta: %lld\n",regs.rip);
+    //printf("val = 0x%" PRIx64 "\n", regs.rip);
+    uint64_t currentValueInstructionRegister = (regs.rip);
+    uint64_t preInstructionRegister = currentValueInstructionRegister-1;
+    rewindInstructionRegister(preInstructionRegister);
+
+    int status;
+    ptrace(PTRACE_SINGLESTEP,child->pid,NULL ,NULL);
+
+    waitpid(child->pid,status,0);
+}
+
 int singlestep()
 {
-    int retval, status, signal = 0;
-    retval = ptrace(PTRACE_SINGLESTEP, child->pid, NULL, signal);
+    int status;
+    int retval = 0;
+    retval = ptrace(PTRACE_SINGLESTEP, child->pid, NULL, NULL);
 
     if( retval ) {
         return retval;
